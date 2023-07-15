@@ -17,7 +17,8 @@ def get_processed_dataset():
 
     handle_nan(df)  # Replace nan with better suited datas
     correct_data_types(df)  # Data types (object instead of int\float)
-    convert_string2categorical(df)  #   convert string categorical to int categorical -> now we can use the correlation matrix
+    convert_string2categorical(
+        df)  # convert string categorical to int categorical -> now we can use the correlation matrix
 
     return df
 
@@ -49,7 +50,8 @@ def correct_data_types(df: pd.DataFrame):
     df[["bore", "stroke"]] = df[["bore", "stroke"]].astype("float")
     df[["normalized-losses"]] = df[["normalized-losses"]].astype("int")
     df[["price"]] = df[["price"]].astype("float")
-    df[["peak-rpm"]] = df[["peak-rpm"]].astype("float")
+    df[["peak-rpm"]] = df[["peak-rpm"]].astype("int")
+
 
 def convert_string2categorical(df: pd.DataFrame):
     label_encoder = LabelEncoder()
@@ -60,8 +62,6 @@ def convert_string2categorical(df: pd.DataFrame):
     # Applica la codifica alle colonne categoriche
     for column in categorical_columns:
         df[column] = label_encoder.fit_transform(df[column])
-
-
 
 
 if __name__ == "__main__":
