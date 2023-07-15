@@ -1,9 +1,10 @@
 import argparse
 
+import numpy as np
 import pandas
 from sklearn.ensemble import RandomForestRegressor, StackingRegressor
 from sklearn.linear_model import LinearRegression, Ridge
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import train_test_split, GridSearchCV, cross_validate
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
 
@@ -22,7 +23,7 @@ def read_args():
     #   cross validation foldings
     parser.add_argument("--cv",
                         type=int,
-                        default=5)
+                        default=2)
     #   ratio of nan values after which the relative column will be dropped
     parser.add_argument("--nan_tolerance",
                         type=float,
@@ -42,7 +43,7 @@ def feature_selection(df: pandas.DataFrame, target_col_name):
     sea.heatmap(corr_matrix, annot=True)
     plt.show()"""
 
-    nf = 20  # nuber of best features to extract
+    nf = 10  # nuber of best features to extract
 
     # sort 'symboling' column from correlation matrix - select the first 20 values (best features) and remove the
     # first one ('symboling' itself)
@@ -117,6 +118,18 @@ def create_ensemble(x_train, y_train):
     ensemble_model = StackingRegressor(estimators=estimators, final_estimator=RandomForestRegressor())
     return ensemble_model
 
+def calculate_scores(ensemble, x_train, y_train):
+    scores = cross_validate(ensemble, x_train, y_train, cv=args.cv,
+                            scoring=('neg_mean_squared_error',
+                                     'neg_mean_absolute_error',
+                                     'r2'))
+
+    mse_scores = -scores['test_neg_mean_squared_error']
+    mae_scores = -scores['test_neg_mean_absolute_error']
+    r2_scores = scores['test_r2']
+
+    return np.mean(mse_scores), np.mean(mae_scores), np.mean(r2_scores)
+
 
 if __name__ == "__main__":
     args = read_args()
@@ -132,9 +145,14 @@ if __name__ == "__main__":
     x_train, x_test = scale_data(x_train, x_test)
 
     #   Create object representing the ensemble of the models
-    regressor_ensemble = create_ensemble(x_train, y_train)
-    print(regressor_ensemble)
+    reg_ensemble = create_ensemble(x_train, y_train)
 
+    #   Score metrics
+    mse, mae, r2 = calculate_scores(reg_ensemble, x_train, y_test)
+
+    print("Stacking ensemble - MSE: ", mse)
+    print("Stacking ensemble - MAE: ", mae)
+    print("Stacking ensemble - R2: ", r2)
 
 
 
