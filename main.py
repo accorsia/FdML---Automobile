@@ -46,7 +46,7 @@ def project_info():
     title("Project args")
     print("Cross validation foldings:\t", args.cv)
     print("Best features:\t", args.n_features)
-    print("########################\n")
+    print("########################################\n")
 
 
 def feature_selection(df: pandas.DataFrame, target_col_name):
@@ -164,9 +164,8 @@ if __name__ == "__main__":
     #   Processed dataset: null values, data types, string categorical
     df = dataset.get_processed_dataset()
 
-    #   Show dataset
-    dataset_info(df)
-    project_info()
+    dataset_info(df)    # dataset info
+    project_info()      # project info
 
     X, Y = split_data(df)  # split data housing
     x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=args.train_test_ratio, random_state=0)
