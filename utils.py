@@ -26,7 +26,7 @@ def title(title):
 
 
 def project_info(args):
-    title("Project args")
+    print("\n------------ Project args --------------")
     print("Cross validation foldings:\t", args.cv)
     print("Best features:\t", args.n_features)
-    print("########################################\n")
+    print("----------------------------------------\n")

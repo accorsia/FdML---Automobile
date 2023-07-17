@@ -36,16 +36,16 @@ def create_models():
 
     models = [
         KNeighborsClassifier(weights='distance'),
-        #LogisticRegression(multi_class='multinomial', solver='saga', class_weight='balanced', max_iter=5000),
+        LogisticRegression(multi_class='multinomial', solver='saga', class_weight='balanced', max_iter=10000),
         SVC(class_weight='balanced'),
         DecisionTreeClassifier(class_weight='balanced')
     ]
 
-    models_names = ['K-NN', 'SVC', 'DT']
+    models_names = ['K-NN', 'Logistic Regression', 'SVC', 'DT']
 
     models_hparametes = [
         {'n_neighbors': list(range(1, 10, 2))},  # KNN
-        #{'penalty': ['l1', 'l2'], 'C': [1e-5, 5e-5, 1e-4, 5e-4, 1]},
+        {'penalty': ['l1', 'l2'], 'C': [1e-5, 5e-5, 1e-4, 5e-4, 1]},
         # SoftmaxReg NB "C" è l'iperprametro di regolarizzazione
         {
             'C': [1e-4, 1e-2, 1, 1e1, 1e2], 'gamma': [0.001, 0.0001],
@@ -76,28 +76,30 @@ def create_classification_ensemble(x_train, y_train):
         print(model_name)
         print('Accuracy:', clf.best_score_, "\n")
 
-    ensemble_classifier = StackingClassifier(estimators=estimators, final_estimator=RandomForestClassifier())
+    ensemble_classifier = StackingClassifier(estimators=estimators, final_estimator=KNeighborsClassifier())
     return ensemble_classifier
 
 
 def calculate_classification_scores(ensemble, x_train, y_train):
+    title("Calculating classification scores: Accuracy, F1 weighted")
     scores = cross_validate(ensemble, x_train, y_train, cv=args.cv,
-                            scoring=('accuracy', 'precision_macro', 'recall_macro', 'f1_macro'))
+                            scoring=('accuracy', 'f1_weighted'))
 
     accuracy_scores = scores['test_accuracy']
-    precision_scores = scores['test_precision_macro']
-    recall_scores = scores['test_recall_macro']
-    f1_scores = scores['test_f1_macro']
+    #precision_scores = scores['test_precision_weighted']
+    #recall_scores = scores['test_recall_weighted']
+    f1_scores = scores['test_f1_weighted']
 
-    return np.mean(accuracy_scores), np.mean(precision_scores), np.mean(recall_scores), np.mean(f1_scores)
+    return np.mean(accuracy_scores), np.mean(f1_scores)#, np.mean(precision_scores), np.mean(recall_scores),
 
 
-def print_metrics(accuracy, precision, recall, f1):
+
+def print_metrics(accuracy, f1):
     utils.title("[Classificator] Training")
 
     print("Stacking ensemble - Accuracy: ", accuracy)
-    print("Stacking ensemble - Precision: ", precision)
-    print("Stacking ensemble - Recall: ", recall)
+    #print("Stacking ensemble - Precision: ", precision)
+    #print("Stacking ensemble - Recall: ", recall)
     print("Stacking ensemble - F1: ", f1)
 
 

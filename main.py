@@ -51,6 +51,31 @@ def scale_data(x_train, x_test):
 
     return x_train, x_test
 
+def calculate_common_metric(y_reg_pred, y_clf_pred, y_test):
+    if len(y_clf_pred == len(y_reg_pred) == len(y_test)):
+        print("Correct y length")
+    else:
+        print("Right y length")
+
+    clf_right = 0
+    reg_right = 0
+
+    for i in range(len(y_test)):
+        if y_clf_pred[i] == y_test[i]:
+            clf_right += 1
+        if y_reg_pred[i] == y_test[i]:
+            reg_right += 1
+
+    perc_reg = reg_right / len(y_test)
+    perc_clf = clf_right / len(y_test)
+
+    title("Custom metric")
+    print("- Percentuale [Regressor] = ", perc_reg)
+    print("- Percentuale [Classification] = ", perc_reg)
+
+
+
+
 
 def categorize_prediction(y):
     for i in range(len(y)):
@@ -74,20 +99,20 @@ if __name__ == "__main__":
 
     ###     Data split + scaling
     X, Y = split_housing(df)  # split data housing
-    x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=args.train_test_ratio, random_state=0)
+    x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=args.train_test_ratio, random_state=42)
     x_train, x_test = scale_data(x_train, x_test)
 
     ###     Create ensembles
     reg_ensemble = reg.create_regression_ensemble(x_train, y_train)
     clf_ensemble = clf.create_classification_ensemble(x_train, y_train)
 
-    ###     Ensembles scores - calculate
+    ###     Ensembles training scores - calculate
     mse, mae, r2 = reg.calculate_regression_scores(reg_ensemble, x_train, y_train)
-    accuracy, precision, recall, f1 = clf.calculate_classification_scores(clf_ensemble, x_train, y_train)
+    accuracy, f1 = clf.calculate_classification_scores(clf_ensemble, x_train, y_train)
 
-    ###     Ensembles scores - print
+    ###     Ensembles training scores - print
     reg.print_metrics(mse, mae, r2)
-    clf.print_metrics(accuracy, precision, recall, f1)
+    clf.print_metrics(accuracy, f1)
 
     ###     Final regressor
     final_reg = reg_ensemble
@@ -104,7 +129,8 @@ if __name__ == "__main__":
 
     clf.print_final_metrics(y_test, y_clf_pred)
 
-
+    ###     Custom common metric
+    calculate_common_metric(y_reg_pred, y_clf_pred, y_test)
 
     #   Plot
     """plt.plot(np.linspace(0, 10, len(y_pred)), y_pred)
