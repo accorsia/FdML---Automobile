@@ -6,8 +6,9 @@ from sklearn.model_selection import GridSearchCV, cross_validate
 from sklearn.svm import SVR
 
 import utils
+from arguments import read_args
 
-ml_cv = 2
+args = read_args()
 
 
 def create_regression_models_items():
@@ -42,7 +43,7 @@ def create_regression_ensemble(x_train, y_train):
 
     for model, model_name, hparameters in zip(models, models_names, models_hparametes):
         #   'GridSearchCV': data structure, with models full info
-        reg = GridSearchCV(estimator=model, param_grid=hparameters, scoring='r2', cv=ml_cv)
+        reg = GridSearchCV(estimator=model, param_grid=hparameters, scoring='r2', cv=args.cv)
         reg.fit(x_train, y_train)
 
         #   append created data structures to collector objects
@@ -62,7 +63,7 @@ def create_regression_ensemble(x_train, y_train):
 
 
 def calculate_regression_scores(ensemble, x_train, y_train):
-    scores = cross_validate(ensemble, x_train, y_train, cv=ml_cv,
+    scores = cross_validate(ensemble, x_train, y_train, cv=args.cv,
                             scoring=('neg_mean_squared_error',
                                      'neg_mean_absolute_error',
                                      'r2'))

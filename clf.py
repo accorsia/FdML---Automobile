@@ -7,12 +7,11 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
-import reg
 import utils
+from arguments import read_args
 from utils import title
 
-cv = reg.ml_cv
-
+args = read_args()
 
 def create_classification_models_items():
     models = [
@@ -37,16 +36,16 @@ def create_models():
 
     models = [
         KNeighborsClassifier(weights='distance'),
-        LogisticRegression(multi_class='multinomial', solver='saga', class_weight='balanced', max_iter=5000),
+        #LogisticRegression(multi_class='multinomial', solver='saga', class_weight='balanced', max_iter=5000),
         SVC(class_weight='balanced'),
         DecisionTreeClassifier(class_weight='balanced')
     ]
 
-    models_names = ['K-NN', 'Logistic Reg.', 'SVT', 'DT']
+    models_names = ['K-NN', 'SVC', 'DT']
 
     models_hparametes = [
         {'n_neighbors': list(range(1, 10, 2))},  # KNN
-        {'penalty': ['l2'], 'C': [1e-5, 5e-5, 1e-4, 5e-4, 1]},
+        #{'penalty': ['l1', 'l2'], 'C': [1e-5, 5e-5, 1e-4, 5e-4, 1]},
         # SoftmaxReg NB "C" è l'iperprametro di regolarizzazione
         {
             'C': [1e-4, 1e-2, 1, 1e1, 1e2], 'gamma': [0.001, 0.0001],
@@ -68,7 +67,7 @@ def create_classification_ensemble(x_train, y_train):
     estimators = []
 
     for model, model_name, hparameters in zip(models, models_names, models_hparametes):
-        clf = GridSearchCV(estimator=model, param_grid=hparameters, scoring='accuracy', cv=cv)
+        clf = GridSearchCV(estimator=model, param_grid=hparameters, scoring='accuracy', cv=args.cv)
         clf.fit(x_train, y_train)
 
         best_hparameters.append(clf.best_params_)
@@ -82,7 +81,7 @@ def create_classification_ensemble(x_train, y_train):
 
 
 def calculate_classification_scores(ensemble, x_train, y_train):
-    scores = cross_validate(ensemble, x_train, y_train, cv=cv,
+    scores = cross_validate(ensemble, x_train, y_train, cv=args.cv,
                             scoring=('accuracy', 'precision_macro', 'recall_macro', 'f1_macro'))
 
     accuracy_scores = scores['test_accuracy']
