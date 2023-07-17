@@ -78,13 +78,13 @@ def calculate_regression_scores(ensemble, x_train, y_train):
 def print_metrics(mse, mae, r2):
     utils.title("[Regressor] Training")
 
-    print("Stacking ensemble - MSE: ", mse)
-    print("Stacking ensemble - MAE: ", mae)
-    print("Stacking ensemble - R2: ", r2)
+    print("- MSE: ", mse)
+    print("- MAE: ", mae)
+    print("- R2: ", r2)
 
 def print_final_metrics(y_test, y_pred):
     utils.title("[Regressor] validation")
 
-    print('Final Regressor - MSE:', metrics.mean_squared_error(y_test, y_pred))
-    print('Final Regressor - MAE:', metrics.mean_absolute_error(y_test, y_pred))
-    print('Final Regressor - R2:', metrics.r2_score(y_test, y_pred))
+    print('- MSE:', metrics.mean_squared_error(y_test, y_pred))
+    print('- MAE:', metrics.mean_absolute_error(y_test, y_pred))
+    print('- R2:', metrics.r2_score(y_test, y_pred))

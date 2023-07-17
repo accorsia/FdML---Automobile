@@ -1,0 +1,53 @@
+PROJECT ENSEMBLE
+
+############  Classifiers  ############
+K-NN
+Accuracy: 0.7317073170731707
+
+SVC
+Accuracy: 0.5975609756097561
+
+DT
+Accuracy: 0.725609756097561
+
+############  [Classification] validation  ############
+Accuracy is  0.7073170731707317
+Precision is  0.7033681765389084
+Recall is  0.7073170731707317
+F1-Score is  0.6963045084996303
+
+############  Custom metric  ############
+...
+
+- [Classification] rights =  29
+-> [Classification] accuracy =  0.7073170731707317
+-> [Classification] score (+1 right, -1 wrong) =  17 / 41
+
+--------
+
+MY ENSEMBLE
+
+############  Classifiers  ############
+SVC
+Accuracy: 0.7073170731707317
+
+Random Forest Classifier
+Accuracy: 0.7804878048780488
+
+Gradient Boosting Classifier
+Accuracy: 0.7378048780487805
+
+############  [Classification] validation  ############
+Accuracy is  0.7073170731707317
+Precision is  0.7230352303523034
+Recall is  0.7073170731707317
+F1-Score is  0.6929367460213947
+
+
+############  Custom metric  ############
+...
+
+- [Classification] rights =  29
+-> [Classification] accuracy =  0.7073170731707317
+-> [Classification] score (+1 right, -1 wrong) =  17 / 41
+

@@ -15,6 +15,7 @@ from utils import *
 
 target_name = "symboling"
 
+
 def feature_selection(df: pandas.DataFrame, target_col_name):
     corr_matrix = df.corr(numeric_only=True).abs()  # 'abs()': needed to select the best features
 
@@ -51,11 +52,14 @@ def scale_data(x_train, x_test):
 
     return x_train, x_test
 
+
 def calculate_common_metric(y_reg_pred, y_clf_pred, y_test):
-    if len(y_clf_pred == len(y_reg_pred) == len(y_test)):
-        print("Correct y length")
+    title("Custom metric")
+
+    if len(y_clf_pred) == len(y_reg_pred) and len(y_reg_pred) == len(y_test):
+        print("Correct y(s) length")
     else:
-        print("Right y length")
+        print("--- Wrong y(s) length! ---")
 
     clf_right = 0
     reg_right = 0
@@ -69,12 +73,13 @@ def calculate_common_metric(y_reg_pred, y_clf_pred, y_test):
     perc_reg = reg_right / len(y_test)
     perc_clf = clf_right / len(y_test)
 
-    title("Custom metric")
-    print("- Percentuale [Regressor] = ", perc_reg)
-    print("- Percentuale [Classification] = ", perc_reg)
+    print("- [Regression] rights = ", reg_right)
+    print("-> [Regression] accuracy = ", perc_reg)
+    print("-> [Regression] score (+1 right, -1 wrong) = ", reg_right - (len(y_test) - reg_right), "/", len(y_test))
 
-
-
+    print("\n- [Classification] rights = ", clf_right)
+    print("-> [Classification] accuracy = ", perc_clf)
+    print("-> [Classification] score (+1 right, -1 wrong) = ", clf_right - (len(y_test) - clf_right), "/", len(y_test))
 
 
 def categorize_prediction(y):
@@ -94,7 +99,7 @@ if __name__ == "__main__":
     df = dataset.get_processed_dataset()
 
     ###     Info (debug)
-    dataset_info(df)
+    #dataset_info(df)
     project_info(args)
 
     ###     Data split + scaling
@@ -108,29 +113,33 @@ if __name__ == "__main__":
 
     ###     Ensembles training scores - calculate
     mse, mae, r2 = reg.calculate_regression_scores(reg_ensemble, x_train, y_train)
-    accuracy, f1 = clf.calculate_classification_scores(clf_ensemble, x_train, y_train)
+    accuracy = clf.calculate_classification_scores_short(clf_ensemble, x_train, y_train)
 
     ###     Ensembles training scores - print
     reg.print_metrics(mse, mae, r2)
-    clf.print_metrics(accuracy, f1)
+    clf.print_metrics_short(accuracy)
 
     ###     Final regressor
     final_reg = reg_ensemble
     final_reg.fit(x_train, y_train)
-    y_reg_pred = final_reg.predict(x_test)
+    y_reg_pred = final_reg.predict(x_test)  # error
     categorize_prediction(y_reg_pred)  # convert continuous values to categorical [-3,...,+3]
 
-    reg.print_final_metrics(y_test, y_reg_pred)  # print final metrics
 
     ###     Final classifier
     final_clf = clf_ensemble
     final_clf.fit(x_train, y_train)
     y_clf_pred = final_clf.predict(x_test)
 
+
+    ###     Final metrics
+    reg.print_final_metrics(y_test, y_reg_pred)
     clf.print_final_metrics(y_test, y_clf_pred)
+
 
     ###     Custom common metric
     calculate_common_metric(y_reg_pred, y_clf_pred, y_test)
+
 
     #   Plot
     """plt.plot(np.linspace(0, 10, len(y_pred)), y_pred)

@@ -13,18 +13,17 @@ from utils import title
 
 args = read_args()
 
-def create_classification_models_items():
+
+def my_create_classification_models_items():
     models = [
-        LogisticRegression(penalty='l2'),
         SVC(),
         RandomForestClassifier(),
         GradientBoostingClassifier()
     ]
 
-    models_names = ['Logistic Regression', 'SVC', 'Random Forest Classifier', 'Gradient Boosting Classifier']
+    models_names = ['SVC', 'Random Forest Classifier', 'Gradient Boosting Classifier']
 
     models_hparametes = [
-        {'penalty': ['l1', 'l2'], 'C': [0.1, 1.0, 10.0]},  # Logistic Regression
         {'kernel': ['linear', 'rbf'], 'C': [0.1, 1.0, 10.0]},  # SVC
         {'n_estimators': [100, 200, 500]},  # Random Forest Classifier
         {}  # GradientBoostingClassifier
@@ -32,25 +31,37 @@ def create_classification_models_items():
 
     return models, models_names, models_hparametes
 
-def create_models():
 
+def final_create_classification_models_items():
     models = [
         KNeighborsClassifier(weights='distance'),
-        LogisticRegression(multi_class='multinomial', solver='saga', class_weight='balanced', max_iter=10000),
+        RandomForestClassifier(),
+        GradientBoostingClassifier()
+    ]
+
+    models_names = ['KNN', 'Random Forest Classifier', 'Gradient Boosting Classifier']
+
+    models_hparametes = [
+        {'n_neighbors': list(range(1, 10, 2))},  # KNN
+        {'n_estimators': [100, 200, 500]},  # Random Forest Classifier
+        {}  # GradientBoostingClassifier
+    ]
+
+    return models, models_names, models_hparametes
+
+
+def prj_create_classification_models_items():
+    models = [
+        KNeighborsClassifier(weights='distance'),
         SVC(class_weight='balanced'),
         DecisionTreeClassifier(class_weight='balanced')
     ]
 
-    models_names = ['K-NN', 'Logistic Regression', 'SVC', 'DT']
+    models_names = ['K-NN', 'SVC', 'DT']
 
     models_hparametes = [
         {'n_neighbors': list(range(1, 10, 2))},  # KNN
-        {'penalty': ['l1', 'l2'], 'C': [1e-5, 5e-5, 1e-4, 5e-4, 1]},
-        # SoftmaxReg NB "C" è l'iperprametro di regolarizzazione
-        {
-            'C': [1e-4, 1e-2, 1, 1e1, 1e2], 'gamma': [0.001, 0.0001],
-            'kernel': ['linear', 'rbf']
-        },  # SMV
+        {'C': [1e-4, 1e-2, 1, 1e1, 1e2], 'gamma': [0.001, 0.0001], 'kernel': ['linear', 'rbf']},  # SVC
         {'criterion': ['gini', 'entropy']},  # DT
     ]
 
@@ -60,8 +71,9 @@ def create_models():
 def create_classification_ensemble(x_train, y_train):
     title("Classifiers")
 
-    #models, models_names, models_hparametes = create_classification_models_items()
-    models, models_names, models_hparametes = create_models()
+    # models, models_names, models_hparametes = my_create_classification_models_items()
+    # models, models_names, models_hparametes = prj_create_classification_models_items()
+    models, models_names, models_hparametes = final_create_classification_models_items()
 
     best_hparameters = []
     estimators = []
@@ -80,27 +92,52 @@ def create_classification_ensemble(x_train, y_train):
     return ensemble_classifier
 
 
-def calculate_classification_scores(ensemble, x_train, y_train):
+def calculate_classification_scores_weight(ensemble, x_train, y_train):
     title("Calculating classification scores: Accuracy, F1 weighted")
     scores = cross_validate(ensemble, x_train, y_train, cv=args.cv,
-                            scoring=('accuracy', 'f1_weighted'))
+                            scoring=('accuracy', 'f1_weighted', 'f1_weighted', 'precision_weighted'))
 
     accuracy_scores = scores['test_accuracy']
-    #precision_scores = scores['test_precision_weighted']
-    #recall_scores = scores['test_recall_weighted']
+    precision_scores = scores['test_precision_weighted']
+    recall_scores = scores['test_recall_weighted']
     f1_scores = scores['test_f1_weighted']
 
-    return np.mean(accuracy_scores), np.mean(f1_scores)#, np.mean(precision_scores), np.mean(recall_scores),
+    return np.mean(accuracy_scores), np.mean(f1_scores), np.mean(precision_scores), np.mean(recall_scores)
 
 
+def calculate_classification_scores(ensemble, x_train, y_train):
+    title("Calculating classification scores: Accuracy, Precision, Recall, F1")
+    scoring = ['accuracy', 'precision', 'recall', 'f1']
+    scores = cross_validate(ensemble, x_train, y_train, cv=args.cv, scoring=scoring)
 
-def print_metrics(accuracy, f1):
+    accuracy_scores = scores['test_accuracy']
+    precision_scores = scores['test_precision']
+    recall_scores = scores['test_recall']
+    f1_scores = scores['test_f1']
+
+def calculate_classification_scores_short(ensemble, x_train, y_train):
+    title("Calculating classification scores: Accuracy")
+    scoring = ['accuracy']
+    scores = cross_validate(ensemble, x_train, y_train, cv=args.cv, scoring=scoring)
+
+    accuracy_scores = scores['test_accuracy']
+
+    return np.mean(accuracy_scores)
+
+
+def print_metrics_long(accuracy, f1, precision, recall):
     utils.title("[Classificator] Training")
 
-    print("Stacking ensemble - Accuracy: ", accuracy)
-    #print("Stacking ensemble - Precision: ", precision)
-    #print("Stacking ensemble - Recall: ", recall)
-    print("Stacking ensemble - F1: ", f1)
+    print("- Accuracy: ", accuracy)
+    print("- F1: ", f1)
+    print("- Precision: ", precision)
+    print("- Recall: ", recall)
+
+
+def print_metrics_short(accuracy, f1):
+    utils.title("[Classificator] Training")
+
+    print("- Accuracy: ", accuracy)
 
 
 def print_final_metrics(y_test, y_pred):

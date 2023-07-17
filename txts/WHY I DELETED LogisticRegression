@@ -1,6 +1,8 @@
-"ConvergenceWarning: The max_iter was reached which means the coef_ did not converge"
+1) "ConvergenceWarning: The max_iter was reached which means the coef_ did not converge"
 Si risolve settando max_iter = 5000
 LogisticRegression(multi_class='multinomial', solver='saga', class_weight='balanced', max_iter=5000),
 
-
 La natura del dataset non è affine alla LogisticRegression
+
+
+2) Bassa accuracy: ~0.5 vs 0.6/0.7 degli altri classificatori
