@@ -1,0 +1,38 @@
+1) Algoritmi usati per l' ensemble
+- Linear Regression
+- Ridge
+- SVR
+- Random Forest (highest R2)
+
+Vanno bene?
+
+2) Algoritmo finale dell' ensemble
+Random Forest
+
+3) Metrics
+- mae
+- mse
+- r2?: misura la proporzione della varianza della variabile target che può essere spiegata dalle variabili indipendenti utilizzate nel modello.
+
+-- motivare la scelta della metrica in modo accurato --
+
+4) Struttura del progetto ispirata a 'example_project' e 'feature_selection' (regression)
+Va bene questa struttura: scaling + features selection (corr matrix) + ensemble
+
+-- riportare le metriche senza queste tecniche: Ablation study --
+
+5) Esempio di relazione e presentazione dati
+FASE 1: presentazione struttura progetto
+FASE 1.5: regressione vs classificatore
+FASE 2: risultati
+
+-- Vantaggio regressione vs classificazione --
+Nella regressione con il min squared error: permette di apprezzare errore ad esempio da -3 a 0
+In classificazione invece è sempre un errore di 1
+
+Posso presentare i risultati di metriche con ensemble di classificatori invece che regressori
+---> necessaria una metrica comune ad hoc
+
+
+Completare con esperimenti
+
