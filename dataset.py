@@ -81,7 +81,7 @@ def enlarge(df: pd.DataFrame):
 
 if __name__ == "__main__":
     df = get_processed_dataset()
-    #df = enlarge(df)
+    # df = enlarge(df)
     print(df)
     print(df.dtypes)
     class_instances(df)

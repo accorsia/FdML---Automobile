@@ -237,10 +237,10 @@ def reg_plot_metric_changes(mae_train, mse_train, r2_train, mae_test, mse_test, 
     # Mostrare il grafico
     plt.show()
 
-def clf_plot_classification_metrics(accuracy_train, precision_train, recall_train, f1_train,
-                                accuracy_test, precision_test, recall_test, f1_test):
-    plt.title('Classification - Metric Comparison')
 
+def clf_plot_classification_metrics(accuracy_train, precision_train, recall_train, f1_train,
+                                    accuracy_test, precision_test, recall_test, f1_test):
+    plt.title('Classification - Metric Comparison')
 
     # Creazione delle ascisse
     metrics = ['Accuracy', 'Precision', 'Recall', 'F1']
@@ -260,6 +260,7 @@ def clf_plot_classification_metrics(accuracy_train, precision_train, recall_trai
 
     # Mostrare il grafico
     plt.show()
+
 
 if __name__ == "__main__":
     ###     Data deserialization
