@@ -1,9 +1,5 @@
-import argparse
-
 import numpy as np
 import pandas
-from matplotlib import pyplot as plt
-from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
@@ -97,7 +93,7 @@ if __name__ == "__main__":
 
     ###     Processed dataset: null values, data types, string categorical
     df = dataset.get_processed_dataset()
-    df = dataset.enlarge(df)
+    df = dataset.enlarge(df)  # duplicate records of class which are poorly represented -> avoid cv problems
 
     ###     Info (debug)
     # dataset_info(df)
@@ -114,7 +110,11 @@ if __name__ == "__main__":
 
     ###     Ensembles training scores - calculate
     mse, mae, r2 = reg.calculate_regression_scores(reg_ensemble, x_train, y_train)
-    clf_scores = clf.calculate_classification_scores(clf_ensemble, x_train, y_train, ['accuracy'])
+    clf_scores = clf.calculate_classification_scores(clf_ensemble, x_train, y_train,
+                                                     ['accuracy',
+                                                      'f1_weighted',
+                                                      'precision_weighted',
+                                                      'recall_weighted'])
 
     ###     Ensembles training scores - print
     reg.print_metrics(mse, mae, r2)

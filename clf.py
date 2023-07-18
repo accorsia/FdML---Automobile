@@ -1,6 +1,5 @@
 import numpy as np
 from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier, StackingClassifier
-from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.model_selection import GridSearchCV, cross_validate, StratifiedKFold
 from sklearn.neighbors import KNeighborsClassifier
@@ -106,13 +105,21 @@ def create_classification_ensemble(x_train, y_train):
 
 
 def calculate_classification_scores(ensemble, x_train, y_train, metrics):
-    title("Calculating classification scores: " + str(metrics))
+    # title("Calculating classification scores: " + str(metrics))
     skf = StratifiedKFold(n_splits=args.cv)
     scores = cross_validate(ensemble, x_train, y_train, cv=skf, scoring=metrics)
 
     mean_scores = {}
     for metric in metrics:
         metric_scores = scores['test_' + metric]
+        """if metric == 'precision':
+            mean_scores[metric] = precision_score(y_train, metric_scores, average='weighted')
+        elif metric == 'recall':
+            mean_scores[metric] = recall_score(y_train, metric_scores, average='weighted')
+        elif metric == 'f1':
+            mean_scores[metric] = f1_score(y_train, metric_scores, average='weighted')
+        elif metric == 'accuracy':
+            mean_scores[metric] = accuracy_score(y_train, metric_scores)"""
         mean_scores[metric] = np.mean(metric_scores)
 
     return mean_scores
