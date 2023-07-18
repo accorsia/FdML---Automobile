@@ -1,9 +1,7 @@
 import itertools
 
-import numpy as np
 import matplotlib.pyplot as plt
-
-from utils import title
+import numpy as np
 
 
 def plot_correlation(series):
@@ -69,7 +67,6 @@ def plot_prediction_differences(y_clf_pred, y_reg_pred):
     plt.style.use("default")
 
 
-
 def plot_error_by_class(y_test, y_clf_pred, y_reg_pred):
     plt.title("Error by class")
 
@@ -91,7 +88,6 @@ def plot_error_by_class(y_test, y_clf_pred, y_reg_pred):
 
     # Larghezza delle barre
     bar_width = 0.35
-
 
     # Disegna il grafico a barre
     plt.bar(bar_positions, clf_errors, width=bar_width, color='blue', label='Classificazione')
@@ -121,6 +117,7 @@ def plot_error_by_class(y_test, y_clf_pred, y_reg_pred):
 
     # Ripristina lo stile predefinito per non influenzare gli altri grafici
     plt.style.use("default")
+
 
 def plot_confusion_matrix(targets, predictions, classes, title, normalize=True, cmap=plt.cm.Blues):
     """
@@ -169,8 +166,8 @@ def plot_confusion_matrix(targets, predictions, classes, title, normalize=True, 
     # Aggiungi i valori nella matrice come testo nel grafico
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
         ax.text(j, i, format(cm[i, j], fmt),
-                 horizontalalignment="center",
-                 color="white" if cm[i, j] > thresh else "black")
+                horizontalalignment="center",
+                color="white" if cm[i, j] > thresh else "black")
 
     # Ridimensiona il grafico in modo ottimale
     plt.tight_layout()
@@ -184,6 +181,7 @@ def plot_confusion_matrix(targets, predictions, classes, title, normalize=True, 
     # Mostra il grafico
     plt.show()
 
+
 def print_errors_by_class(y_ground_truth, y_regression, y_classification):
     classes = np.unique(y_ground_truth)
 
@@ -194,6 +192,7 @@ def print_errors_by_class(y_ground_truth, y_regression, y_classification):
         classification_errors = np.sum(y_ground_truth[y_ground_truth == cls] != y_classification[y_ground_truth == cls])
 
         print(cls, "\t", regression_errors, "\t", classification_errors)
+
 
 def ground_vs_predict(y_test, y_clf_pred, y_reg_pred):
     # Creazione delle ascisse
@@ -216,18 +215,92 @@ def ground_vs_predict(y_test, y_clf_pred, y_reg_pred):
     plt.show()
 
 
+def reg_plot_metric_changes(mae_train, mse_train, r2_train, mae_test, mse_test, r2_test):
+    plt.title('Regression - Metric Comparison')
+
+    # Creazione delle ascisse
+    metrics = ['MAE', 'MSE', 'R2']
+    train_values = [mae_train, mse_train, r2_train]
+    test_values = [mae_test, mse_test, r2_test]
+
+    # Creazione del grafico
+    plt.plot(metrics, train_values, 'b-', marker='o', label='Train')
+    plt.plot(metrics, test_values, 'r-', marker='o', label='Test')
+
+    # Aggiunta di etichette e titolo
+    plt.xlabel('Metrics')
+    plt.ylabel('Metric Value')
+
+    # Aggiunta di una legenda
+    plt.legend()
+
+    # Mostrare il grafico
+    plt.show()
+
+def clf_plot_classification_metrics(accuracy_train, precision_train, recall_train, f1_train,
+                                accuracy_test, precision_test, recall_test, f1_test):
+    plt.title('Classification - Metric Comparison')
+
+
+    # Creazione delle ascisse
+    metrics = ['Accuracy', 'Precision', 'Recall', 'F1']
+    train_values = [accuracy_train, precision_train, recall_train, f1_train]
+    test_values = [accuracy_test, precision_test, recall_test, f1_test]
+
+    # Creazione del grafico
+    plt.plot(metrics, train_values, 'b-', marker='o', label='Train')
+    plt.plot(metrics, test_values, 'r-', marker='o', label='Test')
+
+    # Aggiunta di etichette e titolo
+    plt.xlabel('Metrics')
+    plt.ylabel('Metric Value')
+
+    # Aggiunta di una legenda
+    plt.legend()
+
+    # Mostrare il grafico
+    plt.show()
+
 if __name__ == "__main__":
-    # Carica i valori delle tre variabili y dal file
-    data = np.load('y_values.npz')
+    ###     Data deserialization
+    data = np.load('npz/y_values.npz')
     y_test = data['y_test']
     y_clf_pred = data['y_clf_pred']
     y_reg_pred = data['y_reg_pred']
 
+    #   Classification
+    data = np.load("npz/clf_test.npz")
+    accuracy_test = data["test_accuracy"]
+    precision_test = data["test_precision"]
+    recall_test = data["test_recall"]
+    f1_test = data["test_f1"]
+
+    data = np.load("npz/clf_train.npz")
+    accuracy_train = data["train_accuracy"]
+    precision_train = data["train_precision"]
+    recall_train = data["train_recall"]
+    f1_train = data["train_f1"]
+
+    #   Regression
+    data = np.load("npz/reg_test.npz")
+    mse_test = data["test_mse"]
+    mae_test = data["test_mae"]
+    r2_test = data["test_r2"]
+
+    data = np.load("npz/reg_train.npz")
+    mse_train = data["train_mse"]
+    mae_train = data["train_mae"]
+    r2_train = data["train_r2"]
+
     print_errors_by_class(y_test, y_reg_pred, y_clf_pred)
 
-
+    reg_plot_metric_changes(mae_train, mse_train, r2_train, mae_test, mse_test, r2_test)
+    clf_plot_classification_metrics(accuracy_train, precision_train, recall_train, f1_train,
+                                    accuracy_test, precision_test, recall_test, f1_test)
     plot_prediction_differences(y_clf_pred, y_reg_pred)
     plot_error_by_class(y_test, y_clf_pred, y_reg_pred)
     ground_vs_predict(y_test, y_clf_pred, y_reg_pred)
-    plot_confusion_matrix(targets=y_test, predictions=y_clf_pred, title="Confusion matrix - Classification", classes=np.unique(y_test))
-    plot_confusion_matrix(targets=y_test, predictions=y_reg_pred, title="Confusion matrix - Regression", classes=np.unique(y_test))
+    plot_confusion_matrix(targets=y_test, predictions=y_clf_pred, title="Confusion matrix - Classification",
+                          classes=np.unique(y_test))
+    plot_confusion_matrix(targets=y_test, predictions=y_reg_pred, title="Confusion matrix - Regression",
+                          classes=np.unique(y_test))

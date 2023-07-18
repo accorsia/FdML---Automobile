@@ -76,9 +76,11 @@ def calculate_common_metric(y_reg_pred, y_clf_pred, y_test):
 
         print("\n- [Classification] rights = ", clf_right, "/", len(y_test))
         print("-> [Classification] accuracy = ", perc_clf)
-        print("-> [Classification] score (+1 right, -1 wrong) = ", clf_right - (len(y_test) - clf_right), "/", len(y_test))
+        print("-> [Classification] score (+1 right, -1 wrong) = ", clf_right - (len(y_test) - clf_right), "/",
+              len(y_test))
     else:
         print("--- Wrong y(s) length! ---")
+
 
 def categorize_prediction(y):
     for i in range(len(y)):
@@ -108,7 +110,6 @@ if __name__ == "__main__":
     x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=args.train_test_ratio, random_state=42)
     x_train, x_test = scale_data(x_train, x_test)
 
-
     ###     Create ensembles
     reg_ensemble = reg.create_regression_ensemble(x_train, y_train)
     clf_ensemble = clf.create_classification_ensemble(x_train, y_train)
@@ -116,12 +117,13 @@ if __name__ == "__main__":
     ###     Ensembles training scores - calculate
     mse, mae, r2 = reg.calculate_regression_scores(reg_ensemble, x_train, y_train)
 
-    clf_metrics = metrics = ['accuracy', 'f1_weighted','precision_weighted','recall_weighted']
-    accuracy, f1_weighted, precision_weighted, recall_weighted = clf.calculate_classification_scores(clf_ensemble, x_train, y_train, clf_metrics)
+    clf_metrics = metrics = ['accuracy', 'f1_weighted', 'precision_weighted', 'recall_weighted']
+    accuracy, f1_w, precision_w, recall_w = clf.calculate_classification_scores(clf_ensemble, x_train, y_train,
+                                                                                clf_metrics)
 
     ###     Ensembles training scores - print - serialize
     reg.print_metrics(mse, mae, r2)
-    clf.print_metrics(accuracy, f1_weighted, precision_weighted, recall_weighted)
+    clf.print_metrics(accuracy, f1_w, precision_w, recall_w)
 
     ###     Final regressor
     final_reg = reg_ensemble
@@ -143,4 +145,3 @@ if __name__ == "__main__":
 
     #   Serialize
     np.savez('npz/y_values.npz', y_test=y_test, y_clf_pred=y_clf_pred, y_reg_pred=y_reg_pred)
-

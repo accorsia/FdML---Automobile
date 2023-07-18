@@ -1,7 +1,6 @@
 import numpy as np
 from sklearn import metrics
 from sklearn.ensemble import StackingRegressor, GradientBoostingRegressor, RandomForestRegressor
-from sklearn.linear_model import Ridge
 from sklearn.model_selection import GridSearchCV, cross_validate, StratifiedKFold
 from sklearn.svm import SVR
 
@@ -84,6 +83,7 @@ def print_metrics(mse, mae, r2):
     print("- R2: ", r2)
 
     np.savez("npz/reg_train.npz", train_mse=mse, train_mae=mae, train_r2=r2)
+
 
 def print_final_metrics(y_test, y_pred):
     utils.title("[Regressor] validation")
