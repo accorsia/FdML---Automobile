@@ -2,7 +2,7 @@ import numpy as np
 from sklearn import metrics
 from sklearn.ensemble import StackingRegressor, GradientBoostingRegressor, RandomForestRegressor
 from sklearn.linear_model import Ridge
-from sklearn.model_selection import GridSearchCV, cross_validate
+from sklearn.model_selection import GridSearchCV, cross_validate, StratifiedKFold
 from sklearn.svm import SVR
 
 import utils
@@ -63,7 +63,8 @@ def create_regression_ensemble(x_train, y_train):
 
 
 def calculate_regression_scores(ensemble, x_train, y_train):
-    scores = cross_validate(ensemble, x_train, y_train, cv=args.cv,
+    skf = StratifiedKFold(n_splits=args.cv)
+    scores = cross_validate(ensemble, x_train, y_train, cv=skf,
                             scoring=('neg_mean_squared_error',
                                      'neg_mean_absolute_error',
                                      'r2'))

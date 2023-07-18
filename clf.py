@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier, StackingClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from sklearn.model_selection import GridSearchCV, cross_validate
+from sklearn.model_selection import GridSearchCV, cross_validate, StratifiedKFold
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
@@ -92,7 +92,7 @@ def create_classification_ensemble(x_train, y_train):
     return ensemble_classifier
 
 
-def calculate_classification_scores_weight(ensemble, x_train, y_train):
+"""def calculate_classification_scores_weight(ensemble, x_train, y_train):
     title("Calculating classification scores: Accuracy, F1 weighted")
     scores = cross_validate(ensemble, x_train, y_train, cv=args.cv,
                             scoring=('accuracy', 'f1_weighted', 'f1_weighted', 'precision_weighted'))
@@ -102,42 +102,36 @@ def calculate_classification_scores_weight(ensemble, x_train, y_train):
     recall_scores = scores['test_recall_weighted']
     f1_scores = scores['test_f1_weighted']
 
-    return np.mean(accuracy_scores), np.mean(f1_scores), np.mean(precision_scores), np.mean(recall_scores)
+    return np.mean(accuracy_scores), np.mean(f1_scores), np.mean(precision_scores), np.mean(recall_scores)"""
 
 
-def calculate_classification_scores(ensemble, x_train, y_train):
-    title("Calculating classification scores: Accuracy, Precision, Recall, F1")
-    scoring = ['accuracy', 'precision', 'recall', 'f1']
-    scores = cross_validate(ensemble, x_train, y_train, cv=args.cv, scoring=scoring)
+def calculate_classification_scores(ensemble, x_train, y_train, metrics):
+    title("Calculating classification scores: " + str(metrics))
+    skf = StratifiedKFold(n_splits=args.cv)
+    scores = cross_validate(ensemble, x_train, y_train, cv=skf, scoring=metrics)
 
-    accuracy_scores = scores['test_accuracy']
-    precision_scores = scores['test_precision']
-    recall_scores = scores['test_recall']
-    f1_scores = scores['test_f1']
+    mean_scores = {}
+    for metric in metrics:
+        metric_scores = scores['test_' + metric]
+        mean_scores[metric] = np.mean(metric_scores)
 
-def calculate_classification_scores_short(ensemble, x_train, y_train):
-    title("Calculating classification scores: Accuracy")
-    scoring = ['accuracy']
-    scores = cross_validate(ensemble, x_train, y_train, cv=args.cv, scoring=scoring)
-
-    accuracy_scores = scores['test_accuracy']
-
-    return np.mean(accuracy_scores)
+    return mean_scores
 
 
-def print_metrics_long(accuracy, f1, precision, recall):
+"""def print_metrics_long(accuracy, f1, precision, recall):
     utils.title("[Classificator] Training")
 
     print("- Accuracy: ", accuracy)
     print("- F1: ", f1)
     print("- Precision: ", precision)
-    print("- Recall: ", recall)
+    print("- Recall: ", recall)"""
 
 
-def print_metrics_short(accuracy, f1):
-    utils.title("[Classificator] Training")
+def print_metrics(metrics):
+    utils.title("[Classification] training")
 
-    print("- Accuracy: ", accuracy)
+    for metric, value in metrics.items():
+        print(f'- {metric.capitalize()}:\t{value}')
 
 
 def print_final_metrics(y_test, y_pred):

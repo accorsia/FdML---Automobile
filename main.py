@@ -97,9 +97,10 @@ if __name__ == "__main__":
 
     ###     Processed dataset: null values, data types, string categorical
     df = dataset.get_processed_dataset()
+    df = dataset.enlarge(df)
 
     ###     Info (debug)
-    #dataset_info(df)
+    # dataset_info(df)
     project_info(args)
 
     ###     Data split + scaling
@@ -113,11 +114,11 @@ if __name__ == "__main__":
 
     ###     Ensembles training scores - calculate
     mse, mae, r2 = reg.calculate_regression_scores(reg_ensemble, x_train, y_train)
-    accuracy = clf.calculate_classification_scores_short(clf_ensemble, x_train, y_train)
+    clf_scores = clf.calculate_classification_scores(clf_ensemble, x_train, y_train, ['accuracy'])
 
     ###     Ensembles training scores - print
     reg.print_metrics(mse, mae, r2)
-    clf.print_metrics_short(accuracy)
+    clf.print_metrics(clf_scores)
 
     ###     Final regressor
     final_reg = reg_ensemble
@@ -125,21 +126,17 @@ if __name__ == "__main__":
     y_reg_pred = final_reg.predict(x_test)  # error
     categorize_prediction(y_reg_pred)  # convert continuous values to categorical [-3,...,+3]
 
-
     ###     Final classifier
     final_clf = clf_ensemble
     final_clf.fit(x_train, y_train)
     y_clf_pred = final_clf.predict(x_test)
 
-
     ###     Final metrics
     reg.print_final_metrics(y_test, y_reg_pred)
     clf.print_final_metrics(y_test, y_clf_pred)
 
-
     ###     Custom common metric
     calculate_common_metric(y_reg_pred, y_clf_pred, y_test)
-
 
     #   Plot
     """plt.plot(np.linspace(0, 10, len(y_pred)), y_pred)

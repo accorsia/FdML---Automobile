@@ -63,8 +63,24 @@ def convert_string2categorical(df: pd.DataFrame):
     for column in categorical_columns:
         df[column] = label_encoder.fit_transform(df[column])
 
+def analisi(df: pd.DataFrame):
+
+    for i in range(-3,+4):
+        cont = df['symboling'].value_counts().get(i)
+        print("class ",i," count = ", cont)
+
+
+def enlarge(df: pd.DataFrame):
+    selected_rows = df.loc[df['symboling'] == -2]   # select multiple rows
+    duplicated_rows = pd.concat([selected_rows] * 5, ignore_index=True)    # duplica
+    df = pd.concat([df, duplicated_rows], ignore_index=True)    # concatena
+
+    return df
+
 
 if __name__ == "__main__":
     df = get_processed_dataset()
+    df = enlarge(df)
     print(df)
     print(df.dtypes)
+    analisi(df)
