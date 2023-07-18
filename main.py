@@ -89,6 +89,20 @@ def categorize_prediction(y):
         else:
             y[i] = np.rint(y[i])
 
+def misprediction_analysis(y_reg_pred, y_clf_pred, y_test):
+    title("Misprediction counter")
+    mispredict_cl = {}
+    mispredict_reg = {}
+    for y, ycl, yreg in zip(y_test, y_clf_pred,y_reg_pred):
+        if (y != ycl):
+            mispredict_cl[y] += 1
+        if (y != yreg):
+            mispredict_reg[y] += 1
+
+    print("Label\tClassification\tRegression")
+    for cls in np.unique(y_test):
+        print(cls,"\t",mispredict_cl,"\t",mispredict_reg)
+
 
 if __name__ == "__main__":
     args = read_args()
@@ -140,21 +154,8 @@ if __name__ == "__main__":
 
     ###     Custom common metric
     calculate_common_metric(y_reg_pred, y_clf_pred, y_test)
+    misprediction_analysis(y_reg_pred, y_clf_pred, y_test)
 
     #   Serialize
     np.savez('y_values.npz', y_test=y_test, y_clf_pred=y_clf_pred, y_reg_pred=y_reg_pred)
 
-    #   Plot
-    graph.plot_prediction_errors(y_test, y_clf_pred, y_reg_pred)
-    graph.plot_prediction_differences(y_clf_pred, y_reg_pred)
-    graph.plot_error_by_class(y_test, y_clf_pred, y_reg_pred)
-
-    space = np.linspace(0, len(y_test), len(y_test))
-    plt.plot(space, y_test)
-    plt.plot(space, y_clf_pred)
-    plt.plot(space, y_reg_pred)
-    plt.xlabel('Samples')
-    plt.ylabel('Prediction')
-    plt.title('Comparison of Regressions - Classification - Ground Truth')
-    plt.legend()
-    plt.show()
