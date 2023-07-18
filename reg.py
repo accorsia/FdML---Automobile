@@ -83,9 +83,17 @@ def print_metrics(mse, mae, r2):
     print("- MAE: ", mae)
     print("- R2: ", r2)
 
+    np.savez("npz/reg_train.npz", train_mse=mse, train_mae=mae, train_r2=r2)
+
 def print_final_metrics(y_test, y_pred):
     utils.title("[Regressor] validation")
 
-    print('- MSE:', metrics.mean_squared_error(y_test, y_pred))
-    print('- MAE:', metrics.mean_absolute_error(y_test, y_pred))
-    print('- R2:', metrics.r2_score(y_test, y_pred))
+    final_mse = metrics.mean_squared_error(y_test, y_pred)
+    final_mae = metrics.mean_absolute_error(y_test, y_pred)
+    final_r2 = metrics.r2_score(y_test, y_pred)
+
+    print('- MSE:', final_mse)
+    print('- MAE:', final_mae)
+    print('- R2:', final_r2)
+
+    np.savez("npz/reg_test.npz", test_mse=final_mse, test_mae=final_mae, test_r2=final_r2)

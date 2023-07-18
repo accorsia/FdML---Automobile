@@ -104,7 +104,7 @@ def create_classification_ensemble(x_train, y_train):
     return np.mean(accuracy_scores), np.mean(f1_scores), np.mean(precision_scores), np.mean(recall_scores)"""
 
 
-def calculate_classification_scores(ensemble, x_train, y_train, metrics):
+def calculate_classification_scores_vector(ensemble, x_train, y_train, metrics):
     # title("Calculating classification scores: " + str(metrics))
     skf = StratifiedKFold(n_splits=args.cv)
     scores = cross_validate(ensemble, x_train, y_train, cv=skf, scoring=metrics)
@@ -117,17 +117,63 @@ def calculate_classification_scores(ensemble, x_train, y_train, metrics):
     return mean_scores
 
 
-def print_metrics(metrics):
+def calculate_classification_scores(ensemble, x_train, y_train, metrics):
+    # metrics = ['accuracy', 'f1_weighted','precision_weighted','recall_weighted']
+
+    skf = StratifiedKFold(n_splits=args.cv)
+    scores = cross_validate(ensemble, x_train, y_train, cv=skf, scoring=metrics)
+
+    accuracy = np.mean(scores['test_accuracy'])
+    f1_weighted = np.mean(scores["test_f1_weighted"])
+    precision_weighted = np.mean(scores["test_precision_weighted"])
+    recall_weighted = np.mean(scores["test_recall_weighted"])
+
+    return accuracy, f1_weighted, precision_weighted, recall_weighted
+
+
+def print_metrics_vector(metrics):
     utils.title("[Classification] training")
 
     for metric, value in metrics.items():
         print(f'- {metric.capitalize()}:\t{value}')
 
+    np.savez("npz/clf_train.npz",
+             train_accuracy=metrics['accuracy'],
+             train_f1_weighted=metrics['f1_weighted'],
+             train_precision_weighted=metrics['precision_weighted'],
+             train_recall_weighted=metrics['recall_weighted'])
+
+
+def print_metrics(accuracy, f1_weighted, precision_weighted, recall_weighted):
+    utils.title("[Classification] training")
+
+    print("- Accuracy:\t", accuracy)
+    print("- F1 weighted:\t", f1_weighted)
+    print("- Precision weighted:\t", precision_weighted)
+    print("- Recall weighted:\t", recall_weighted)
+
+    np.savez("npz/clf_train.npz",
+             train_accuracy=accuracy,
+             train_f1_weighted=f1_weighted,
+             train_precision_weighted=precision_weighted,
+             train_recall_weighted=recall_weighted)
+
 
 def print_final_metrics(y_test, y_pred):
     utils.title("[Classification] validation")
 
-    print('Accuracy is ', accuracy_score(y_test, y_pred))
-    print('Precision is ', precision_score(y_test, y_pred, average='weighted'))
-    print('Recall is ', recall_score(y_test, y_pred, average='weighted'))
-    print('F1-Score is ', f1_score(y_test, y_pred, average='weighted'))
+    final_accuracy = accuracy_score(y_test, y_pred)
+    final_precision = precision_score(y_test, y_pred, average='weighted')
+    final_recall = recall_score(y_test, y_pred, average='weighted')
+    final_f1 = f1_score(y_test, y_pred, average='weighted')
+
+    print('Accuracy is ', final_accuracy)
+    print('Precision is ', final_precision)
+    print('Recall is ', final_recall)
+    print('F1-Score is ', final_f1)
+
+    np.savez("npz/clf_test.npz",
+             test_accuracy=final_accuracy,
+             test_precision=final_precision,
+             test_recall=final_recall,
+             test_f1=final_f1)

@@ -3,7 +3,12 @@ import itertools
 import numpy as np
 import matplotlib.pyplot as plt
 
+from utils import title
+
+
 def plot_correlation(series):
+    plt.title("Plots correlation")
+
     # Ottenere gli indici e i valori dalla Series
     x = series.index
     y = series.values
@@ -29,14 +34,13 @@ def plot_correlation(series):
 
 
 def plot_prediction_differences(y_clf_pred, y_reg_pred):
-    # Calcola le differenze tra le predizioni
-    differences = y_clf_pred - y_reg_pred
+    plt.title("Scarto tra le predizioni")
 
-    # Calcola il valore assoluto delle differenze
-    abs_differences = np.abs(differences)
+    # Calcola il valore assoluto delle differenze tra le predizioni
+    abs_differences = np.abs(y_clf_pred - y_reg_pred)
 
     # Crea il grafico a barre per le differenze tra le predizioni
-    plt.bar(np.arange(len(differences)), abs_differences, color='green')
+    plt.bar(np.arange(len(abs_differences)), abs_differences, color='green')
 
     # Aggiungi etichette agli assi
     plt.xlabel('Istanze')
@@ -77,7 +81,7 @@ def plot_error_by_class(y_test, y_clf_pred, y_reg_pred):
     for cls in classes:
         cls_indices = np.where(y_test == cls)
         clf_errors.append(np.sum(y_clf_pred[cls_indices] != cls))
-        reg_errors.append(np.sum(np.abs(y_reg_pred[cls_indices] - cls)))
+        reg_errors.append(np.sum(y_reg_pred[cls_indices] != cls))
 
     # Calcola il numero totale di classi
     num_classes = len(classes)
@@ -118,10 +122,7 @@ def plot_error_by_class(y_test, y_clf_pred, y_reg_pred):
     # Ripristina lo stile predefinito per non influenzare gli altri grafici
     plt.style.use("default")
 
-def plot_confusion_matrix(targets, predictions, classes,
-                          normalize=True,
-                          title='Confusion matrix',
-                          cmap=plt.cm.Blues):
+def plot_confusion_matrix(targets, predictions, classes, title, normalize=True, cmap=plt.cm.Blues):
     """
     Questa funzione stampa e disegna la matrice di confusione.
     La normalizzazione può essere applicata impostando `normalize=True`.
@@ -183,7 +184,16 @@ def plot_confusion_matrix(targets, predictions, classes,
     # Mostra il grafico
     plt.show()
 
+def print_errors_by_class(y_ground_truth, y_regression, y_classification):
+    classes = np.unique(y_ground_truth)
 
+    print("Class:\tRegression\tClassification")
+
+    for cls in classes:
+        regression_errors = np.sum(y_ground_truth[y_ground_truth == cls] != y_regression[y_ground_truth == cls])
+        classification_errors = np.sum(y_ground_truth[y_ground_truth == cls] != y_classification[y_ground_truth == cls])
+
+        print(cls, "\t", regression_errors, "\t", classification_errors)
 
 def ground_vs_predict(y_test, y_clf_pred, y_reg_pred):
     # Creazione delle ascisse
@@ -212,6 +222,9 @@ if __name__ == "__main__":
     y_test = data['y_test']
     y_clf_pred = data['y_clf_pred']
     y_reg_pred = data['y_reg_pred']
+
+    print_errors_by_class(y_test, y_reg_pred, y_clf_pred)
+
 
     plot_prediction_differences(y_clf_pred, y_reg_pred)
     plot_error_by_class(y_test, y_clf_pred, y_reg_pred)

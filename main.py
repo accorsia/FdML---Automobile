@@ -89,19 +89,7 @@ def categorize_prediction(y):
         else:
             y[i] = np.rint(y[i])
 
-def misprediction_analysis(y_reg_pred, y_clf_pred, y_test):
-    title("Misprediction counter")
-    mispredict_cl = {}
-    mispredict_reg = {}
-    for y, ycl, yreg in zip(y_test, y_clf_pred,y_reg_pred):
-        if (y != ycl):
-            mispredict_cl[y] += 1
-        if (y != yreg):
-            mispredict_reg[y] += 1
-
-    print("Label\tClassification\tRegression")
-    for cls in np.unique(y_test):
-        print(cls,"\t",mispredict_cl,"\t",mispredict_reg)
+    y = y.astype(int)
 
 
 if __name__ == "__main__":
@@ -127,15 +115,13 @@ if __name__ == "__main__":
 
     ###     Ensembles training scores - calculate
     mse, mae, r2 = reg.calculate_regression_scores(reg_ensemble, x_train, y_train)
-    clf_scores = clf.calculate_classification_scores(clf_ensemble, x_train, y_train,
-                                                     ['accuracy',
-                                                      'f1_weighted',
-                                                      'precision_weighted',
-                                                      'recall_weighted'])
 
-    ###     Ensembles training scores - print
+    clf_metrics = metrics = ['accuracy', 'f1_weighted','precision_weighted','recall_weighted']
+    accuracy, f1_weighted, precision_weighted, recall_weighted = clf.calculate_classification_scores(clf_ensemble, x_train, y_train, clf_metrics)
+
+    ###     Ensembles training scores - print - serialize
     reg.print_metrics(mse, mae, r2)
-    clf.print_metrics(clf_scores)
+    clf.print_metrics(accuracy, f1_weighted, precision_weighted, recall_weighted)
 
     ###     Final regressor
     final_reg = reg_ensemble
@@ -148,14 +134,13 @@ if __name__ == "__main__":
     final_clf.fit(x_train, y_train)
     y_clf_pred = final_clf.predict(x_test)
 
-    ###     Final metrics
+    ###     Final metrics - calculate - print - serialize
     reg.print_final_metrics(y_test, y_reg_pred)
     clf.print_final_metrics(y_test, y_clf_pred)
 
     ###     Custom common metric
     calculate_common_metric(y_reg_pred, y_clf_pred, y_test)
-    misprediction_analysis(y_reg_pred, y_clf_pred, y_test)
 
     #   Serialize
-    np.savez('y_values.npz', y_test=y_test, y_clf_pred=y_clf_pred, y_reg_pred=y_reg_pred)
+    np.savez('npz/y_values.npz', y_test=y_test, y_clf_pred=y_clf_pred, y_reg_pred=y_reg_pred)
 
