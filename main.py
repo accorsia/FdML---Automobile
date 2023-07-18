@@ -1,10 +1,13 @@
 import numpy as np
 import pandas
+import seaborn as sea
+from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 import clf
 import dataset
+import graph
 import reg
 from arguments import read_args
 from utils import *
@@ -16,9 +19,8 @@ def feature_selection(df: pandas.DataFrame, target_col_name):
     corr_matrix = df.corr(numeric_only=True).abs()  # 'abs()': needed to select the best features
 
     #   Plot correlation matrix
-    """corr_matrix = df.corr()
-    sea.heatmap(corr_matrix, annot=True)
-    plt.show()"""
+    sea.heatmap(corr_matrix, annot=False, cmap='coolwarm', fmt=".1f")
+    plt.show()
 
     nf = args.n_features  # nuber of best features to extract
 
@@ -26,6 +28,8 @@ def feature_selection(df: pandas.DataFrame, target_col_name):
     # first one ('symboling' itself)
     best_features_columns = corr_matrix[target_col_name].sort_values(ascending=False).iloc[1:nf + 1]
     best_features_indexes = best_features_columns.index.values
+
+    graph.plot_correlation(corr_matrix[target_col_name].sort_values(ascending=False).iloc[1:])
 
     return best_features_indexes
 
@@ -53,30 +57,28 @@ def calculate_common_metric(y_reg_pred, y_clf_pred, y_test):
     title("Custom metric")
 
     if len(y_clf_pred) == len(y_reg_pred) and len(y_reg_pred) == len(y_test):
-        print("Correct y(s) length")
+        print("Correct y(s) length\n")
+        clf_right = 0
+        reg_right = 0
+
+        for i in range(len(y_test)):
+            if y_clf_pred[i] == y_test[i]:
+                clf_right += 1
+            if y_reg_pred[i] == y_test[i]:
+                reg_right += 1
+
+        perc_reg = reg_right / len(y_test)
+        perc_clf = clf_right / len(y_test)
+
+        print("- [Regression] rights = ", reg_right, "/", len(y_test))
+        print("-> [Regression] accuracy = ", perc_reg)
+        print("-> [Regression] score (+1 right, -1 wrong) = ", reg_right - (len(y_test) - reg_right), "/", len(y_test))
+
+        print("\n- [Classification] rights = ", clf_right, "/", len(y_test))
+        print("-> [Classification] accuracy = ", perc_clf)
+        print("-> [Classification] score (+1 right, -1 wrong) = ", clf_right - (len(y_test) - clf_right), "/", len(y_test))
     else:
         print("--- Wrong y(s) length! ---")
-
-    clf_right = 0
-    reg_right = 0
-
-    for i in range(len(y_test)):
-        if y_clf_pred[i] == y_test[i]:
-            clf_right += 1
-        if y_reg_pred[i] == y_test[i]:
-            reg_right += 1
-
-    perc_reg = reg_right / len(y_test)
-    perc_clf = clf_right / len(y_test)
-
-    print("- [Regression] rights = ", reg_right)
-    print("-> [Regression] accuracy = ", perc_reg)
-    print("-> [Regression] score (+1 right, -1 wrong) = ", reg_right - (len(y_test) - reg_right), "/", len(y_test))
-
-    print("\n- [Classification] rights = ", clf_right)
-    print("-> [Classification] accuracy = ", perc_clf)
-    print("-> [Classification] score (+1 right, -1 wrong) = ", clf_right - (len(y_test) - clf_right), "/", len(y_test))
-
 
 def categorize_prediction(y):
     for i in range(len(y)):
@@ -104,6 +106,7 @@ if __name__ == "__main__":
     x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=args.train_test_ratio, random_state=42)
     x_train, x_test = scale_data(x_train, x_test)
 
+
     ###     Create ensembles
     reg_ensemble = reg.create_regression_ensemble(x_train, y_train)
     clf_ensemble = clf.create_classification_ensemble(x_train, y_train)
@@ -123,7 +126,7 @@ if __name__ == "__main__":
     ###     Final regressor
     final_reg = reg_ensemble
     final_reg.fit(x_train, y_train)
-    y_reg_pred = final_reg.predict(x_test)  # error
+    y_reg_pred = final_reg.predict(x_test)
     categorize_prediction(y_reg_pred)  # convert continuous values to categorical [-3,...,+3]
 
     ###     Final classifier
@@ -138,11 +141,20 @@ if __name__ == "__main__":
     ###     Custom common metric
     calculate_common_metric(y_reg_pred, y_clf_pred, y_test)
 
+    #   Serialize
+    np.savez('y_values.npz', y_test=y_test, y_clf_pred=y_clf_pred, y_reg_pred=y_reg_pred)
+
     #   Plot
-    """plt.plot(np.linspace(0, 10, len(y_pred)), y_pred)
-    plt.plot(np.linspace(0, 10, len(y_test)), y_test)
-    plt.xlabel('Data Point')
-    plt.ylabel('Value')
-    plt.title('Comparison of True and Predicted Values')
+    graph.plot_prediction_errors(y_test, y_clf_pred, y_reg_pred)
+    graph.plot_prediction_differences(y_clf_pred, y_reg_pred)
+    graph.plot_error_by_class(y_test, y_clf_pred, y_reg_pred)
+
+    space = np.linspace(0, len(y_test), len(y_test))
+    plt.plot(space, y_test)
+    plt.plot(space, y_clf_pred)
+    plt.plot(space, y_reg_pred)
+    plt.xlabel('Samples')
+    plt.ylabel('Prediction')
+    plt.title('Comparison of Regressions - Classification - Ground Truth')
     plt.legend()
-    plt.show()"""
+    plt.show()

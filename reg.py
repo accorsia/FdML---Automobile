@@ -14,17 +14,17 @@ args = read_args()
 def create_regression_models_items():
     models = [
         # LinearRegression(),
-        Ridge(),
+        # Ridge(),
         SVR(),
         RandomForestRegressor(),
         GradientBoostingRegressor()
     ]
 
-    models_names = ['Ridge', 'SVR', 'Random Forest', 'Gradient Boosting Regressor']
+    models_names = ['SVR', 'Random Forest', 'Gradient Boosting Regressor']
 
     models_hparametes = [
         # {},  # Linear regression
-        {'alpha': [0.1, 1.0, 10.0]},  # Ridge
+        # {'alpha': [0.1, 1.0, 10.0]},  # Ridge
         {'kernel': ['linear', 'rbf'], 'C': [0.1, 1.0, 10.0]},  # SVR
         {'n_estimators': [100, 200, 500]},  # Random Forest
         {}  # GradientBoostingRegressor

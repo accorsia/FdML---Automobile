@@ -12,9 +12,6 @@ def get_row_dataset():
 def get_processed_dataset():
     df = get_row_dataset()
 
-    #   replace '?' to 'Nan' so that 'pd.dropna' can remove the missing values
-    df.replace("?", np.NaN, inplace=True)
-
     handle_nan(df)  # Replace nan with better suited datas
     correct_data_types(df)  # Data types (object instead of int\float)
     convert_string2categorical(
@@ -24,6 +21,9 @@ def get_processed_dataset():
 
 
 def handle_nan(df: pd.DataFrame):
+    #   replace '?' to 'Nan' so that 'pd.dropna' can remove the missing values
+    df.replace("?", np.NaN, inplace=True)
+
     #   Data cleaning
     nan_ratios = df.isna().sum() / len(df)
 
@@ -81,7 +81,7 @@ def enlarge(df: pd.DataFrame):
 
 if __name__ == "__main__":
     df = get_processed_dataset()
-    df = enlarge(df)
+    #df = enlarge(df)
     print(df)
     print(df.dtypes)
     class_instances(df)

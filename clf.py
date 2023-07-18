@@ -112,26 +112,9 @@ def calculate_classification_scores(ensemble, x_train, y_train, metrics):
     mean_scores = {}
     for metric in metrics:
         metric_scores = scores['test_' + metric]
-        """if metric == 'precision':
-            mean_scores[metric] = precision_score(y_train, metric_scores, average='weighted')
-        elif metric == 'recall':
-            mean_scores[metric] = recall_score(y_train, metric_scores, average='weighted')
-        elif metric == 'f1':
-            mean_scores[metric] = f1_score(y_train, metric_scores, average='weighted')
-        elif metric == 'accuracy':
-            mean_scores[metric] = accuracy_score(y_train, metric_scores)"""
         mean_scores[metric] = np.mean(metric_scores)
 
     return mean_scores
-
-
-"""def print_metrics_long(accuracy, f1, precision, recall):
-    utils.title("[Classificator] Training")
-
-    print("- Accuracy: ", accuracy)
-    print("- F1: ", f1)
-    print("- Precision: ", precision)
-    print("- Recall: ", recall)"""
 
 
 def print_metrics(metrics):
