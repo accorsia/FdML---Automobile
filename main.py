@@ -1,7 +1,5 @@
 import numpy as np
 import pandas
-import seaborn as sea
-from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
@@ -78,6 +76,10 @@ def calculate_common_metric(y_reg_pred, y_clf_pred, y_test):
         print("-> [Classification] accuracy = ", perc_clf)
         print("-> [Classification] score (+1 right, -1 wrong) = ", clf_right - (len(y_test) - clf_right), "/",
               len(y_test))
+
+        #   Serialization
+        np.savez("npz/final_accuracy.npz", reg_acc=perc_reg, clf_acc=perc_clf)
+
     else:
         print("--- Wrong y(s) length! ---")
 

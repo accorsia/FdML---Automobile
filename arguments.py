@@ -11,7 +11,7 @@ def read_args():
     #   cross validation foldings
     parser.add_argument("--cv",
                         type=int,
-                        default=5)
+                        default=2)
     #   ratio of nan values after which the relative column will be dropped
     parser.add_argument("--nan_tolerance",
                         type=float,

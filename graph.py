@@ -24,7 +24,8 @@ def plot_features_correlation(series):
     plt.plot(y, x, linestyle='-', color='red')
 
     # Aggiungere una linea orizzontale nera alla decima barra
-    plt.axhline(y=9.5, color='black', linestyle='--', label=str(arguments.read_args().n_features)+' Best features split')
+    plt.axhline(y=9.5, color='black', linestyle='--',
+                label=str(arguments.read_args().n_features) + ' Best features split')
 
     # Aggiungere le etichette agli assi
     plt.xlabel('Valori')
@@ -298,6 +299,42 @@ def plot_clf_metrics_changes(accuracy_train, precision_train, recall_train, f1_t
     plt.show()
 
 
+def plot_corr_matrix(corr_matrix):
+    plt.figure(figsize=(10, 8))  # Adjust the figure size as per your preference
+    sea.heatmap(corr_matrix, annot=False, cmap='coolwarm', fmt=".1f")
+    plt.tight_layout()  # Adjust layout to prevent labels from getting cut off
+    plt.show()
+
+
+def plot_ensemble_accuracies(perc_clf, perc_reg):
+    ind = [1, 2]  # Bar indexes
+    accuracies = [perc_clf, perc_reg]  # Bar values
+    labels = ['Classification', 'Regression']  # Labels
+    colors = ['#1f77b4', '#2ca02c']  # Bar colors
+
+    # Set seaborn style only for the bar chart
+    with sea.axes_style('whitegrid', {'axes.grid': True, 'grid.linestyle': '--', 'grid.color': '0.4'}):
+        plt.bar(ind, accuracies, color=colors, label=labels)  # Create the bar chart
+        plt.title("Validation test Accuracy comparison")
+
+    # Add labels to axes
+    plt.xlabel('Ensembles')
+    plt.ylabel('Accuracy')
+
+    plt.ylim(0, 1)  # Set y-axis limits to reach up to 1
+
+    # Add labels to the bars with accuracy values
+    for i, acc in zip(ind, accuracies):
+        plt.text(i, acc, f"{acc:.2f}", ha='center', va='bottom', fontsize=12, fontweight='bold', color='black')
+
+    plt.xticks(ind, ['Classification', 'Regression'])
+    plt.legend()
+    plt.show()
+
+    # Restore the default style
+    sea.set_style('ticks')
+
+
 if __name__ == "__main__":
     ###     Data deserialization
     data = np.load('npz/y_values.npz')
@@ -329,7 +366,14 @@ if __name__ == "__main__":
     mae_train = data["train_mae"]
     r2_train = data["train_r2"]
 
+    #   Accuracy
+    data = np.load("npz/final_accuracy.npz")
+    reg_acc = data["reg_acc"]
+    reg_clf = data["clf_acc"]
+
     print_errors_by_class(y_test, y_reg_pred, y_clf_pred)  # terminal
+
+    ####################################################################################################################
 
     ###     Graph
     plot_reg_metric_changes(mae_train, mse_train, r2_train, mae_test, mse_test, r2_test)
@@ -338,14 +382,8 @@ if __name__ == "__main__":
     plot_prediction_differences(y_clf_pred, y_reg_pred)
     plot_error_by_class(y_test, y_clf_pred, y_reg_pred)
     plot_bar_ground_vs_predict(y_test, y_clf_pred, y_reg_pred)
+    plot_ensemble_accuracies(reg_clf, reg_acc)
     plot_confusion_matrix(targets=y_test, predictions=y_clf_pred, title="Confusion matrix - Classification",
                           classes=np.unique(y_test))
     plot_confusion_matrix(targets=y_test, predictions=y_reg_pred, title="Confusion matrix - Regression",
                           classes=np.unique(y_test))
-
-
-def plot_corr_matrix(corr_matrix):
-    plt.figure(figsize=(10, 8))  # Adjust the figure size as per your preference
-    sea.heatmap(corr_matrix, annot=False, cmap='coolwarm', fmt=".1f")
-    plt.tight_layout()  # Adjust layout to prevent labels from getting cut off
-    plt.show()
