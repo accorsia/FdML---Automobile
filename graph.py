@@ -2,9 +2,12 @@ import itertools
 
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sea
+
+import arguments
 
 
-def plot_correlation(series):
+def plot_features_correlation(series):
     plt.title("Plots correlation")
 
     # Ottenere gli indici e i valori dalla Series
@@ -19,6 +22,9 @@ def plot_correlation(series):
 
     # Tracciare una linea che congiunge le varie barre
     plt.plot(y, x, linestyle='-', color='red')
+
+    # Aggiungere una linea orizzontale nera alla decima barra
+    plt.axhline(y=9.5, color='black', linestyle='--', label=str(arguments.read_args().n_features)+' Best features split')
 
     # Aggiungere le etichette agli assi
     plt.xlabel('Valori')
@@ -336,3 +342,10 @@ if __name__ == "__main__":
                           classes=np.unique(y_test))
     plot_confusion_matrix(targets=y_test, predictions=y_reg_pred, title="Confusion matrix - Regression",
                           classes=np.unique(y_test))
+
+
+def plot_corr_matrix(corr_matrix):
+    plt.figure(figsize=(10, 8))  # Adjust the figure size as per your preference
+    sea.heatmap(corr_matrix, annot=False, cmap='coolwarm', fmt=".1f")
+    plt.tight_layout()  # Adjust layout to prevent labels from getting cut off
+    plt.show()

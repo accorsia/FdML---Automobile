@@ -18,18 +18,18 @@ target_name = "symboling"
 def feature_selection(df: pandas.DataFrame, target_col_name):
     corr_matrix = df.corr(numeric_only=True).abs()  # 'abs()': needed to select the best features
 
-    #   Plot correlation matrix
-    sea.heatmap(corr_matrix, annot=False, cmap='coolwarm', fmt=".1f")
-    plt.show()
+    ###     [Plot] correlation matrix
+    graph.plot_corr_matrix(corr_matrix)
 
     nf = args.n_features  # nuber of best features to extract
 
-    # sort 'symboling' column from correlation matrix - select the first 20 values (best features) and remove the
-    # first one ('symboling' itself)
+    # sort 'symboling' column from correlation matrix - select the first 'n_features = 10' values (best features)
+    # -> remove the first one ('symboling' itself)
     best_features_columns = corr_matrix[target_col_name].sort_values(ascending=False).iloc[1:nf + 1]
     best_features_indexes = best_features_columns.index.values
 
-    graph.plot_correlation(corr_matrix[target_col_name].sort_values(ascending=False).iloc[1:])
+    ###     [Plot] all features correlation, with a line splitting selected (10) best features
+    graph.plot_features_correlation(corr_matrix[target_col_name].sort_values(ascending=False).iloc[1:])
 
     return best_features_indexes
 
