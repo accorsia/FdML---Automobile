@@ -49,7 +49,7 @@ def plot_prediction_differences(y_clf_pred, y_reg_pred):
 
     # Aggiungi una linea orizzontale per il valore medio delle differenze
     mean_difference = np.mean(abs_differences)
-    plt.axhline(y=mean_difference, color='red', linestyle='--', label='Media')
+    plt.axhline(y=mean_difference, color='red', linestyle='--', label=f'Media: {mean_difference:.2f}')
 
     # Aggiungi legenda
     plt.legend()
@@ -121,9 +121,17 @@ def plot_error_by_class(y_test, y_clf_pred, y_reg_pred):
 
 def plot_confusion_matrix(targets, predictions, classes, title, normalize=True, cmap=plt.cm.Blues):
     """
-    Questa funzione stampa e disegna la matrice di confusione.
-    La normalizzazione può essere applicata impostando `normalize=True`.
+        This function prints and plots the confusion matrix.
+
+        Parameters:
+            targets (array): Ground truth labels.
+            predictions (array): Predicted labels.
+            classes (array): Unique class labels.
+            normalize (bool, optional): Whether to normalize the confusion matrix. Default is True.
+            title (str, optional): Title of the plot. Default is 'Confusion matrix'.
+            cmap (colormap, optional): Colormap to use for the plot. Default is plt.cm.Blues.
     """
+
     # Calcola il numero di classi
     n_classes, = np.unique(targets).shape
 
@@ -194,7 +202,7 @@ def print_errors_by_class(y_ground_truth, y_regression, y_classification):
         print(cls, "\t", regression_errors, "\t", classification_errors)
 
 
-def ground_vs_predict(y_test, y_clf_pred, y_reg_pred):
+"""def ground_vs_predict(y_test, y_clf_pred, y_reg_pred):
     # Creazione delle ascisse
     x = np.arange(len(y_test))
 
@@ -212,10 +220,32 @@ def ground_vs_predict(y_test, y_clf_pred, y_reg_pred):
     plt.legend(loc="lower right")
 
     # Mostrare il grafico
+    plt.show()"""
+
+
+def plot_bar_ground_vs_predict(y_test, y_clf_pred, y_reg_pred):
+    # Creazione delle ascisse
+    x = np.arange(len(y_test))
+
+    # Creazione del grafico a barre
+    width = 0.2
+    plt.bar(x - width, y_test, width=width, label='Valori Effettivi', color='green')
+    plt.bar(x, y_clf_pred, width=width, label='Previsioni Ensemble di Classificazione', color='blue')
+    plt.bar(x + width, y_reg_pred, width=width, label='Previsioni Ensemble di Regressione', color='red')
+
+    # Aggiunta di etichette e titolo
+    plt.xlabel('Osservazioni')
+    plt.ylabel('Valori')
+    plt.title('Confronto tra Previsioni e Valori Effettivi')
+
+    # Aggiunta di legenda
+    plt.legend(loc="upper left")
+
+    # Mostrare il grafico
     plt.show()
 
 
-def reg_plot_metric_changes(mae_train, mse_train, r2_train, mae_test, mse_test, r2_test):
+def plot_reg_metric_changes(mae_train, mse_train, r2_train, mae_test, mse_test, r2_test):
     plt.title('Regression - Metric Comparison')
 
     # Creazione delle ascisse
@@ -238,8 +268,8 @@ def reg_plot_metric_changes(mae_train, mse_train, r2_train, mae_test, mse_test, 
     plt.show()
 
 
-def clf_plot_classification_metrics(accuracy_train, precision_train, recall_train, f1_train,
-                                    accuracy_test, precision_test, recall_test, f1_test):
+def plot_clf_metrics_changes(accuracy_train, precision_train, recall_train, f1_train,
+                             accuracy_test, precision_test, recall_test, f1_test):
     plt.title('Classification - Metric Comparison')
 
     # Creazione delle ascisse
@@ -293,14 +323,15 @@ if __name__ == "__main__":
     mae_train = data["train_mae"]
     r2_train = data["train_r2"]
 
-    print_errors_by_class(y_test, y_reg_pred, y_clf_pred)
+    print_errors_by_class(y_test, y_reg_pred, y_clf_pred)  # terminal
 
-    reg_plot_metric_changes(mae_train, mse_train, r2_train, mae_test, mse_test, r2_test)
-    clf_plot_classification_metrics(accuracy_train, precision_train, recall_train, f1_train,
-                                    accuracy_test, precision_test, recall_test, f1_test)
+    ###     Graph
+    plot_reg_metric_changes(mae_train, mse_train, r2_train, mae_test, mse_test, r2_test)
+    plot_clf_metrics_changes(accuracy_train, precision_train, recall_train, f1_train,
+                             accuracy_test, precision_test, recall_test, f1_test)
     plot_prediction_differences(y_clf_pred, y_reg_pred)
     plot_error_by_class(y_test, y_clf_pred, y_reg_pred)
-    ground_vs_predict(y_test, y_clf_pred, y_reg_pred)
+    plot_bar_ground_vs_predict(y_test, y_clf_pred, y_reg_pred)
     plot_confusion_matrix(targets=y_test, predictions=y_clf_pred, title="Confusion matrix - Classification",
                           classes=np.unique(y_test))
     plot_confusion_matrix(targets=y_test, predictions=y_reg_pred, title="Confusion matrix - Regression",
