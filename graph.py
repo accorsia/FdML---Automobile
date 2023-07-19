@@ -1,4 +1,5 @@
 import itertools
+import os
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -335,6 +336,107 @@ def plot_ensemble_accuracies(perc_clf, perc_reg):
     sea.set_style('ticks')
 
 
+def plot_r2(r2_dict):
+    # Estrai i nomi dei modelli e i valori R2 dal dizionario
+    x_regressors = [x.replace("Regressor", "") for x in list(r2_dict.keys())]  # remove 'Regressor' from x labels
+    r2_values = list(r2_dict.values())
+
+    # Calcola la media dei valori R2
+    mean_r2 = np.mean(r2_values)
+
+    # Colori per il grafico
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
+
+    # Crea la figura e l'asse
+    fig, ax = plt.subplots()
+
+    # Aggiungi l'istogramma
+    ax.bar(x_regressors, r2_values, color=colors)
+
+    # Aggiungi la linea media
+    ax.axhline(y=mean_r2, color='red', linestyle='dashed', label=f'Media ({mean_r2:.2f})')
+
+    # Aggiungi le etichette dell'asse x e y con stile grassetto
+    ax.set_xlabel('Modelli', fontweight='bold')
+    ax.set_ylabel('Valore R2', fontweight='bold')
+    ax.set_title('Confronto R2 dei Modelli', fontweight='bold')
+
+    # Aggiungi le etichette sopra le barre con maggiore trasparenza
+    for i, v in enumerate(r2_values):
+        ax.text(i, v + 0.01, f'{v:.2f}', ha='center', va='bottom', fontsize=10, fontweight='bold', alpha=0.8)
+
+    # Aggiungi una legenda
+    ax.legend()
+
+    # Mostra il grafico
+    plt.tight_layout()
+    plt.show()
+def plot_accuracy(accuracy_dict):
+    # Estrai i nomi dei modelli e i valori di accuratezza dal dizionario
+    x_classifiers = [x.replace("Classifier", "") for x in list(accuracy_dict.keys())]  # Rimuovi 'Classifier' dalle etichette x
+    accuracy_values = list(accuracy_dict.values())
+
+    # Calcola la media dei valori di accuratezza
+    mean_accuracy = np.mean(accuracy_values)
+
+    # Colori per il grafico
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
+
+    # Crea la figura e l'asse
+    fig, ax = plt.subplots()
+
+    # Aggiungi l'istogramma
+    ax.bar(x_classifiers, accuracy_values, color=colors)
+
+    # Aggiungi la linea media
+    ax.axhline(y=mean_accuracy, color='red', linestyle='dashed', label=f'Media ({mean_accuracy:.2f})')
+
+    # Aggiungi le etichette dell'asse x e y con stile grassetto
+    ax.set_xlabel('Modelli', fontweight='bold')
+    ax.set_ylabel('Accuratezza', fontweight='bold')
+    ax.set_title('Confronto Accuratezza dei Modelli', fontweight='bold')
+
+    # Aggiungi le etichette sopra le barre con maggiore trasparenza
+    for i, v in enumerate(accuracy_values):
+        ax.text(i, v + 0.01, f'{v:.2f}', ha='center', va='bottom', fontsize=10, fontweight='bold', alpha=0.8)
+
+    # Aggiungi una legenda
+    ax.legend()
+
+    # Mostra il grafico
+    plt.tight_layout()
+    plt.show()
+
+def plot_r2b(scores_dict):
+    plt.figure(figsize=(10, 6))
+
+    # Estrai i nomi dei modelli e i valori di R2 dal dizionario
+    models = list(scores_dict.keys())
+    r2_scores = list(scores_dict.values())
+
+    # Crea il grafico a barre
+    bars = plt.bar(models, r2_scores, color='lightblue')
+
+    # Aggiungi le etichette dei valori sopra le barre
+    for bar in bars:
+        height = bar.get_height()
+        plt.annotate(f'{height:.3f}', xy=(bar.get_x() + bar.get_width() / 2, height),
+                     xytext=(0, 3), textcoords='offset points',
+                     ha='center', va='bottom')
+
+    # Aggiungi le griglie di sfondo meno evidenti
+    plt.grid(color='lightgray', linestyle='dashed', linewidth=0.5, alpha=0.5)
+
+    # Imposta le etichette degli assi e il titolo del grafico
+    plt.xlabel('Modelli')
+    plt.ylabel('R2 Score')
+    plt.title('Confronto R2 Score per Modelli di Regressione')
+
+    # Mostra il grafico
+    plt.tight_layout()
+    plt.show()
+
+
 if __name__ == "__main__":
     ###     Data deserialization
     data = np.load('npz/y_values.npz')
@@ -373,9 +475,20 @@ if __name__ == "__main__":
 
     print_errors_by_class(y_test, y_reg_pred, y_clf_pred)  # terminal
 
+    #   regression models - R2
+    data = np.load("npz/reg_models_r2.npz", allow_pickle=True)
+    r2_dict = data["dict"].item()
+
+    #   regression models - R2
+    data = np.load("npz/clf_models_accuracy.npz", allow_pickle=True)
+    clf_dict = data["dict"].item()
+
     ####################################################################################################################
 
     ###     Graph
+    plot_r2(r2_dict)
+    plot_accuracy(clf_dict)
+
     plot_reg_metric_changes(mae_train, mse_train, r2_train, mae_test, mse_test, r2_test)
     plot_clf_metrics_changes(accuracy_train, precision_train, recall_train, f1_train,
                              accuracy_test, precision_test, recall_test, f1_test)

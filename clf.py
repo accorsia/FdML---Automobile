@@ -13,7 +13,7 @@ from utils import title
 args = read_args()
 
 
-def my_create_classification_models_items():
+"""def my_create_classification_models_items():
     models = [
         SVC(),
         RandomForestClassifier(),
@@ -28,8 +28,24 @@ def my_create_classification_models_items():
         {}  # GradientBoostingClassifier
     ]
 
-    return models, models_names, models_hparametes
+    return models, models_names, models_hparametes"""
+"""def prj_create_classification_models_items():
+    models = [
+        KNeighborsClassifier(weights='distance'),
+        SVC(class_weight='balanced'),
+        DecisionTreeClassifier(class_weight='balanced')
+    ]
 
+    models_names = ['K-NN', 'SVC', 'DT']
+
+    models_hparametes = [
+        {'n_neighbors': list(range(1, 10, 2))},  # KNN
+        {'C': [1e-4, 1e-2, 1, 1e1, 1e2], 'gamma': [0.001, 0.0001], 'kernel': ['linear', 'rbf']},  # SVC
+        {'criterion': ['gini', 'entropy']},  # DT
+    ]
+
+    return models, models_names, models_hparametes
+"""
 
 def final_create_classification_models_items():
     models = [
@@ -49,22 +65,6 @@ def final_create_classification_models_items():
     return models, models_names, models_hparametes
 
 
-def prj_create_classification_models_items():
-    models = [
-        KNeighborsClassifier(weights='distance'),
-        SVC(class_weight='balanced'),
-        DecisionTreeClassifier(class_weight='balanced')
-    ]
-
-    models_names = ['K-NN', 'SVC', 'DT']
-
-    models_hparametes = [
-        {'n_neighbors': list(range(1, 10, 2))},  # KNN
-        {'C': [1e-4, 1e-2, 1, 1e1, 1e2], 'gamma': [0.001, 0.0001], 'kernel': ['linear', 'rbf']},  # SVC
-        {'criterion': ['gini', 'entropy']},  # DT
-    ]
-
-    return models, models_names, models_hparametes
 
 
 def create_classification_ensemble(x_train, y_train):
@@ -74,8 +74,10 @@ def create_classification_ensemble(x_train, y_train):
     # models, models_names, models_hparametes = prj_create_classification_models_items()
     models, models_names, models_hparametes = final_create_classification_models_items()
 
-    best_hparameters = []
-    estimators = []
+    estimators = []  # models
+    best_hparameters = []   # models hyperparameters
+
+    serial_scores = {}  # this dict will be serialized
 
     for model, model_name, hparameters in zip(models, models_names, models_hparametes):
         clf = GridSearchCV(estimator=model, param_grid=hparameters, scoring='accuracy', cv=args.cv)
@@ -84,8 +86,15 @@ def create_classification_ensemble(x_train, y_train):
         best_hparameters.append(clf.best_params_)
         estimators.append((model_name, clf))
 
+        #   debug
         print(model_name)
         print('Accuracy:', clf.best_score_, "\n")
+
+        #   store score into serialization dict
+        serial_scores[model_name] = clf.best_score_
+
+    ###     Serialization
+    np.savez("npz/clf_models_accuracy.npz", dict=serial_scores)
 
     ensemble_classifier = StackingClassifier(estimators=estimators, final_estimator=KNeighborsClassifier())
     return ensemble_classifier

@@ -40,6 +40,8 @@ def create_regression_ensemble(x_train, y_train):
     best_hparameters = []  # calculated best hparam value for each model
     estimators = []  # list of models with theirs metadata
 
+    serial_scores = {}  # dict that will be serialized
+
     for model, model_name, hparameters in zip(models, models_names, models_hparametes):
         #   'GridSearchCV': data structure, with models full info
         reg = GridSearchCV(estimator=model, param_grid=hparameters, scoring='r2', cv=args.cv)
@@ -52,6 +54,12 @@ def create_regression_ensemble(x_train, y_train):
         #   debug
         print(model_name)
         print('R2 Score:', reg.best_score_, "\n")
+
+        #   store score into serialization dict
+        serial_scores[model_name] = reg.best_score_
+
+    ###     Serialization
+    np.savez("npz/reg_models_r2.npz", dict=serial_scores)
 
     """
     Solitamente si usa il modello più stabile com 'final_estimator', che non per forza deve essere il modello con R2 più alto

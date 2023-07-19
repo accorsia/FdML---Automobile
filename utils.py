@@ -1,3 +1,6 @@
+import os
+
+import numpy as np
 import pandas as pd
 
 
@@ -29,3 +32,17 @@ def project_info(args):
     print("Cross validation foldings:\t", args.cv)
     print("Best features:\t", args.n_features)
     print("----------------------------------------\n")
+
+def serialize(filepath, *args, **kwds):
+    directory = os.path.dirname(filepath)
+
+    # Crea le cartelle intermedie se non esistono
+    if directory and not os.path.exists(directory):
+        os.makedirs(directory)
+
+    # Rimuove il file se esiste già
+    if os.path.exists(filepath):
+        os.remove(filepath)
+
+    # Salva i dati nel file npz
+    np.savez(filepath, *args, **kwds)
