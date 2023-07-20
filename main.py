@@ -1,4 +1,3 @@
-import numpy as np
 import pandas
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -78,7 +77,7 @@ def calculate_common_metric(y_reg_pred, y_clf_pred, y_test):
               len(y_test))
 
         #   Serialization
-        np.savez("npz/final_accuracy.npz", reg_acc=perc_reg, clf_acc=perc_clf)
+        npserialize("npz/final_accuracy.npz", reg_acc=perc_reg, clf_acc=perc_clf)
 
     else:
         print("--- Wrong y(s) length! ---")
@@ -101,7 +100,8 @@ if __name__ == "__main__":
 
     ###     Processed dataset: null values, data types, string categorical
     df = dataset.get_processed_dataset()
-    df = dataset.enlarge(df)  # duplicate records of class which are poorly represented -> avoid cv problems
+    df = dataset.enlarge(
+        df)  # use random oversampler (factor = 1/3) -> avoid cross validation fold with no classes problems
 
     ###     Info (debug)
     # dataset_info(df)
@@ -122,7 +122,6 @@ if __name__ == "__main__":
     clf_metrics = metrics = ['accuracy', 'f1_weighted', 'precision_weighted', 'recall_weighted']
     accuracy, f1_w, precision_w, recall_w = clf.calculate_classification_scores(clf_ensemble, x_train, y_train,
                                                                                 clf_metrics)
-
     ###     Ensembles training scores - print - serialize
     reg.print_metrics(mse, mae, r2)
     clf.print_metrics(accuracy, f1_w, precision_w, recall_w)
@@ -146,4 +145,4 @@ if __name__ == "__main__":
     calculate_common_metric(y_reg_pred, y_clf_pred, y_test)
 
     #   Serialize
-    np.savez('npz/y_values.npz', y_test=y_test, y_clf_pred=y_clf_pred, y_reg_pred=y_reg_pred)
+    npserialize('npz/y_values.npz', y_test=y_test, y_clf_pred=y_clf_pred, y_reg_pred=y_reg_pred)

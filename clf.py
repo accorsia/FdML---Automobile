@@ -1,17 +1,13 @@
-import numpy as np
 from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier, StackingClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.model_selection import GridSearchCV, cross_validate, StratifiedKFold
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeClassifier
 
-import utils
 from arguments import read_args
+from utils import *
 from utils import title
 
 args = read_args()
-
 
 """def my_create_classification_models_items():
     models = [
@@ -47,6 +43,7 @@ args = read_args()
     return models, models_names, models_hparametes
 """
 
+
 def final_create_classification_models_items():
     models = [
         KNeighborsClassifier(weights='distance'),
@@ -65,8 +62,6 @@ def final_create_classification_models_items():
     return models, models_names, models_hparametes
 
 
-
-
 def create_classification_ensemble(x_train, y_train):
     title("Classifiers")
 
@@ -75,7 +70,7 @@ def create_classification_ensemble(x_train, y_train):
     models, models_names, models_hparametes = final_create_classification_models_items()
 
     estimators = []  # models
-    best_hparameters = []   # models hyperparameters
+    best_hparameters = []  # models hyperparameters
 
     serial_scores = {}  # this dict will be serialized
 
@@ -94,7 +89,7 @@ def create_classification_ensemble(x_train, y_train):
         serial_scores[model_name] = clf.best_score_
 
     ###     Serialization
-    np.savez("npz/clf_models_accuracy.npz", dict=serial_scores)
+    npserialize("npz/clf_models_accuracy.npz", dict=serial_scores)
 
     ensemble_classifier = StackingClassifier(estimators=estimators, final_estimator=KNeighborsClassifier())
     return ensemble_classifier
@@ -130,7 +125,7 @@ def print_metrics_vector(metrics):
     for metric, value in metrics.items():
         print(f'- {metric.capitalize()}:\t{value}')
 
-    np.savez("npz/clf_train.npz",
+    npserialize("npz/clf_train.npz",
              train_accuracy=metrics['accuracy'],
              train_f1_weighted=metrics['f1_weighted'],
              train_precision_weighted=metrics['precision_weighted'],
@@ -152,22 +147,22 @@ def calculate_classification_scores(ensemble, x_train, y_train, metrics):
 
 
 def print_metrics(accuracy, f1_weighted, precision_weighted, recall_weighted):
-    utils.title("[Classification] training")
+    title("[Classification] training")
 
     print("- Accuracy:\t", accuracy)
     print("- F1 weighted:\t", f1_weighted)
     print("- Precision weighted:\t", precision_weighted)
     print("- Recall weighted:\t", recall_weighted)
 
-    np.savez("npz/clf_train.npz",
-             train_accuracy=accuracy,
-             train_f1=f1_weighted,
-             train_precision=precision_weighted,
-             train_recall=recall_weighted)
+    npserialize("npz/clf_train.npz",
+                train_accuracy=accuracy,
+                train_f1=f1_weighted,
+                train_precision=precision_weighted,
+                train_recall=recall_weighted)
 
 
 def print_final_metrics(y_test, y_pred):
-    utils.title("[Classification] validation")
+    title("[Classification] validation")
 
     final_accuracy = accuracy_score(y_test, y_pred)
     final_precision = precision_score(y_test, y_pred, average='weighted')
@@ -179,8 +174,8 @@ def print_final_metrics(y_test, y_pred):
     print('Recall:\t', final_recall)
     print('F1-Score:\t', final_f1)
 
-    np.savez("npz/clf_test.npz",
-             test_accuracy=final_accuracy,
-             test_precision=final_precision,
-             test_recall=final_recall,
-             test_f1=final_f1)
+    npserialize("npz/clf_test.npz",
+                test_accuracy=final_accuracy,
+                test_precision=final_precision,
+                test_recall=final_recall,
+                test_f1=final_f1)

@@ -1,11 +1,35 @@
 import itertools
-import os
 
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sea
 
 import arguments
+
+
+def plot_class_instances(values, title):
+    # Etichette delle classi, da -3 a +3
+    labels = np.arange(-3, 4)
+
+    # Calcola la media dei valori
+    mean_value = np.mean(values)
+
+    # Creazione del grafico a barre
+    plt.bar(labels, values, color='skyblue', edgecolor='black')
+
+    # Aggiungi una riga per indicare la media dei valori
+    plt.axhline(y=mean_value, color='red', linestyle='--', label=f'Media: {mean_value:.2f}')
+
+    # Aggiungi etichette agli assi e un titolo
+    plt.xlabel('Classi')
+    plt.ylabel('Numero di istanze')
+    plt.title('Numero di istanze per classe: ' + title)
+
+    # Aggiungi una legenda
+    plt.legend()
+
+    # Mostra il grafico
+    plt.show()
 
 
 def plot_features_correlation(series):
@@ -371,9 +395,12 @@ def plot_r2(r2_dict):
     # Mostra il grafico
     plt.tight_layout()
     plt.show()
+
+
 def plot_accuracy(accuracy_dict):
     # Estrai i nomi dei modelli e i valori di accuratezza dal dizionario
-    x_classifiers = [x.replace("Classifier", "") for x in list(accuracy_dict.keys())]  # Rimuovi 'Classifier' dalle etichette x
+    x_classifiers = [x.replace("Classifier", "") for x in
+                     list(accuracy_dict.keys())]  # Rimuovi 'Classifier' dalle etichette x
     accuracy_values = list(accuracy_dict.values())
 
     # Calcola la media dei valori di accuratezza
@@ -406,6 +433,7 @@ def plot_accuracy(accuracy_dict):
     # Mostra il grafico
     plt.tight_layout()
     plt.show()
+
 
 def plot_r2b(scores_dict):
     plt.figure(figsize=(10, 6))

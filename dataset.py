@@ -1,8 +1,13 @@
 import numpy as np
 import pandas as pd
+from imblearn.over_sampling import RandomOverSampler
 from sklearn.preprocessing import LabelEncoder
 
+import arguments
+import graph
 import main
+
+target_name = "symboling"
 
 
 def get_row_dataset():
@@ -64,14 +69,19 @@ def convert_string2categorical(df: pd.DataFrame):
         df[column] = label_encoder.fit_transform(df[column])
 
 
-def class_instances(df: pd.DataFrame):
+def class_instances(df: pd.DataFrame, title):
     print("label\tinstances")
+    cl_ist = []
+
     for i in range(-3, +4):
-        cont = df['symboling'].value_counts().get(i)
+        cont = df['symboling'].value_counts().get(i, 0)
         print(i, "\t", cont)
+        cl_ist.append(cont)
+
+    graph.plot_class_instances(cl_ist, title)
 
 
-def enlarge(df: pd.DataFrame):
+def old_enlarge(df: pd.DataFrame):
     selected_rows = df.loc[df['symboling'] == -2]  # select multiple rows
     duplicated_rows = pd.concat([selected_rows] * 3, ignore_index=True)  # duplica
     df = pd.concat([df, duplicated_rows], ignore_index=True)  # concatena
@@ -79,9 +89,38 @@ def enlarge(df: pd.DataFrame):
     return df
 
 
+def enlarge(df: pd.DataFrame):
+    x = df.drop(columns=[target_name])
+    y = df[target_name]
+
+    class_distribution = y.value_counts().to_dict()  # <label, count(sample of that label)>
+
+    max_instances = max(class_distribution.values())
+
+    sampling_strategy = {}
+
+    #   Oversampling strength
+    for label, count in class_distribution.items():
+        sampling_strategy[label] = int(count + (max_instances - count) * arguments.read_args().ovsmpl_fct)
+
+    oversampler = RandomOverSampler(sampling_strategy=sampling_strategy, random_state=42)
+
+    x_balanced, y_balanced = oversampler.fit_resample(x, y)
+
+    df_balanced = pd.DataFrame(x_balanced, columns=x.columns)
+    df_balanced.insert(0, target_name, y_balanced)
+
+    return df_balanced
+
+
 if __name__ == "__main__":
     df = get_processed_dataset()
-    # df = enlarge(df)
+
+    orig_df = old_enlarge(df)
+    bal_df = enlarge(df)
+
+    class_instances(df, 'original Df')
+    class_instances(bal_df, 'sampling_strategy = 0.33')
+
     print(df)
     print(df.dtypes)
-    class_instances(df)

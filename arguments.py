@@ -24,5 +24,8 @@ def read_args():
     parser.add_argument("--n_features",
                         type=int,
                         default=10)
+    parser.add_argument("---ovsmpl_fct",
+                        type=float,
+                        default=1 / 3)
 
     return parser.parse_args()

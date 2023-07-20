@@ -33,7 +33,8 @@ def project_info(args):
     print("Best features:\t", args.n_features)
     print("----------------------------------------\n")
 
-def serialize(filepath, *args, **kwds):
+
+def npserialize(filepath, *args, **kwds):
     directory = os.path.dirname(filepath)
 
     # Crea le cartelle intermedie se non esistono

@@ -1,11 +1,10 @@
-import numpy as np
 from sklearn import metrics
 from sklearn.ensemble import StackingRegressor, GradientBoostingRegressor, RandomForestRegressor
 from sklearn.model_selection import GridSearchCV, cross_validate, StratifiedKFold
 from sklearn.svm import SVR
 
-import utils
 from arguments import read_args
+from utils import *
 
 args = read_args()
 
@@ -33,7 +32,7 @@ def create_regression_models_items():
 
 
 def create_regression_ensemble(x_train, y_train):
-    utils.title("Regressors")
+    title("Regressors")
 
     models, models_names, models_hparametes = create_regression_models_items()
 
@@ -59,7 +58,7 @@ def create_regression_ensemble(x_train, y_train):
         serial_scores[model_name] = reg.best_score_
 
     ###     Serialization
-    np.savez("npz/reg_models_r2.npz", dict=serial_scores)
+    npserialize("npz/reg_models_r2.npz", dict=serial_scores)
 
     """
     Solitamente si usa il modello più stabile com 'final_estimator', che non per forza deve essere il modello con R2 più alto
@@ -84,17 +83,17 @@ def calculate_regression_scores(ensemble, x_train, y_train):
 
 
 def print_metrics(mse, mae, r2):
-    utils.title("[Regressor] Training")
+    title("[Regressor] Training")
 
     print("- MSE: ", mse)
     print("- MAE: ", mae)
     print("- R2: ", r2)
 
-    np.savez("npz/reg_train.npz", train_mse=mse, train_mae=mae, train_r2=r2)
+    npserialize("npz/reg_train.npz", train_mse=mse, train_mae=mae, train_r2=r2)
 
 
 def print_final_metrics(y_test, y_pred):
-    utils.title("[Regressor] validation")
+    title("[Regressor] validation")
 
     final_mse = metrics.mean_squared_error(y_test, y_pred)
     final_mae = metrics.mean_absolute_error(y_test, y_pred)
@@ -104,4 +103,4 @@ def print_final_metrics(y_test, y_pred):
     print('- MAE:', final_mae)
     print('- R2:', final_r2)
 
-    np.savez("npz/reg_test.npz", test_mse=final_mse, test_mae=final_mae, test_r2=final_r2)
+    npserialize("npz/reg_test.npz", test_mse=final_mse, test_mae=final_mae, test_r2=final_r2)
