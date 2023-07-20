@@ -24,8 +24,12 @@ def read_args():
     parser.add_argument("--n_features",
                         type=int,
                         default=10)
+    #   [dataset.py] oversampling factor
     parser.add_argument("---ovsmpl_fct",
                         type=float,
                         default=1 / 3)
+    parser.add_argument("---target_name",
+                        type=str,
+                        default="symboling")
 
     return parser.parse_args()

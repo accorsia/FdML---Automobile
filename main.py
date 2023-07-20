@@ -9,7 +9,7 @@ import reg
 from arguments import read_args
 from utils import *
 
-target_name = "symboling"
+target_name = read_args().target_name
 
 
 def feature_selection(df: pandas.DataFrame, target_col_name):
