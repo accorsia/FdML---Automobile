@@ -425,6 +425,69 @@ def plot_accuracy(accuracy_dict):
     plt.show()
 
 
+def plot_performance_comparison2(clf_acc_bef, reg_acc_bef,
+                                clf_acc_aft, reg_acc_aft):
+    # Costruisci l'indice delle barre
+    index = [0, 1]
+
+    # Larghezza delle barre
+    bar_width = 0.35
+
+    # Costruisci le barre per l'ensemble di classificatori e regressori prima e dopo l'oversampling
+    plt.bar(index, [clf_acc_bef, reg_acc_bef], bar_width,
+            label='Before Oversampling')
+    plt.bar(index + bar_width, [clf_acc_aft, reg_acc_aft], bar_width,
+            label='After Oversampling')
+
+    # Etichette sugli assi e titolo del grafico
+    plt.xlabel('Ensemble Type')
+    plt.ylabel('Accuracy')
+    plt.title('Performance Comparison before and after Oversampling')
+
+    # Etichette sugli indici delle barre
+    plt.xticks(index + bar_width / 2, ['Classifier', 'Regressor'])
+
+    # Aggiungi legenda
+    plt.legend()
+
+    # Mostra il grafico
+    plt.show()
+
+
+def plot_performance_comparison(clf_acc_bef, reg_acc_bef, clf_acc_aft, reg_acc_aft):
+    # Costruisci l'indice delle barre
+    index = [0, 1]
+
+    # Larghezza delle barre
+    bar_width = 0.35
+
+    # Costruisci le barre per l'ensemble di classificatori e regressori prima e dopo l'oversampling
+    plt.bar(index, [clf_acc_bef, reg_acc_bef], bar_width, label='Before Oversampling')
+    plt.bar([i + bar_width for i in index], [clf_acc_aft, reg_acc_aft], bar_width, label='After Oversampling')
+
+    # Etichette sugli assi e titolo del grafico (in grassetto)
+    plt.xlabel('Ensemble Type', fontweight='bold')
+    plt.ylabel('Accuracy', fontweight='bold')
+    plt.title('Performance comparison before and after Oversampling', fontweight='bold')
+
+    # Etichette sugli indici delle barre
+    plt.xticks([i + bar_width / 2 for i in index], ['Classifier', 'Regressor'])
+
+    # Aggiungi i valori sopra ogni colonna
+    for i, v in enumerate([clf_acc_bef, reg_acc_bef]):
+        plt.text(i, v + 0.01, f'{v:.2f}', ha='center', va='bottom', fontsize=10, fontweight='bold', alpha=0.8)
+
+    for i, v in enumerate([clf_acc_aft, reg_acc_aft]):
+        plt.text(i + bar_width, v + 0.01, f'{v:.2f}', ha='center', va='bottom', fontsize=10, fontweight='bold',
+                 alpha=0.8)
+
+    plt.ylim(0, max(clf_acc_bef, reg_acc_bef, clf_acc_aft, reg_acc_aft)+0.1)
+    # Sposta la legenda in basso a destra
+    plt.legend(loc='lower right')
+
+    # Mostra il grafico
+    plt.show()
+
 
 if __name__ == "__main__":
     ###     Data deserialization
@@ -460,7 +523,10 @@ if __name__ == "__main__":
     #   Accuracy
     data = np.load("npz/final_accuracy.npz")
     reg_acc = data["reg_acc"]
-    reg_clf = data["clf_acc"]
+    clf_acc = data["clf_acc"]
+    reg_acc_bef = 0.67
+    clf_acc_bef = 0.79
+
 
     print_errors_by_class(y_test, y_reg_pred, y_clf_pred)  # terminal
 
@@ -475,17 +541,19 @@ if __name__ == "__main__":
     ####################################################################################################################
 
     ###     Graph
-    plot_r2(r2_dict)
-    plot_accuracy(clf_dict)
+    plot_performance_comparison(clf_acc_bef, reg_acc, clf_acc, reg_acc)
 
-    plot_reg_metric_changes(mae_train, mse_train, r2_train, mae_test, mse_test, r2_test)
-    plot_clf_metrics_changes(accuracy_train, precision_train, recall_train, f1_train,
-                             accuracy_test, precision_test, recall_test, f1_test)
-    plot_prediction_differences(y_clf_pred, y_reg_pred)
-    plot_error_by_class(y_test, y_clf_pred, y_reg_pred)
-    plot_bar_ground_vs_predict(y_test, y_clf_pred, y_reg_pred)
-    plot_ensembles_common_accuracy(reg_clf, reg_acc)
-    plot_confusion_matrix(targets=y_test, predictions=y_clf_pred, title="Confusion matrix - Classification",
-                          classes=np.unique(y_test))
-    plot_confusion_matrix(targets=y_test, predictions=y_reg_pred, title="Confusion matrix - Regression",
-                          classes=np.unique(y_test))
+    # plot_r2(r2_dict)
+    # plot_accuracy(clf_dict)
+    #
+    # plot_reg_metric_changes(mae_train, mse_train, r2_train, mae_test, mse_test, r2_test)
+    # plot_clf_metrics_changes(accuracy_train, precision_train, recall_train, f1_train,
+    #                          accuracy_test, precision_test, recall_test, f1_test)
+    # plot_prediction_differences(y_clf_pred, y_reg_pred)
+    # plot_error_by_class(y_test, y_clf_pred, y_reg_pred)
+    # plot_bar_ground_vs_predict(y_test, y_clf_pred, y_reg_pred)
+    # plot_ensembles_common_accuracy(clf_acc, reg_acc)
+    # plot_confusion_matrix(targets=y_test, predictions=y_clf_pred, title="Confusion matrix - Classification",
+    #                       classes=np.unique(y_test))
+    # plot_confusion_matrix(targets=y_test, predictions=y_reg_pred, title="Confusion matrix - Regression",
+    #                       classes=np.unique(y_test))
