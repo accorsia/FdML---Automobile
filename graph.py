@@ -331,7 +331,7 @@ def plot_corr_matrix(corr_matrix):
     plt.show()
 
 
-def plot_ensemble_accuracies(perc_clf, perc_reg):
+def plot_ensembles_common_accuracy(perc_clf, perc_reg):
     ind = [1, 2]  # Bar indexes
     accuracies = [perc_clf, perc_reg]  # Bar values
     labels = ['Classification', 'Regression']  # Labels
@@ -343,8 +343,8 @@ def plot_ensemble_accuracies(perc_clf, perc_reg):
         plt.title("Validation test Accuracy comparison")
 
     # Add labels to axes
-    plt.xlabel('Ensembles')
-    plt.ylabel('Accuracy')
+    plt.xlabel('Ensembles', fontweight='bold')
+    plt.ylabel('Accuracy', fontweight='bold')
 
     plt.ylim(0, 1)  # Set y-axis limits to reach up to 1
 
@@ -353,7 +353,7 @@ def plot_ensemble_accuracies(perc_clf, perc_reg):
         plt.text(i, acc, f"{acc:.2f}", ha='center', va='bottom', fontsize=12, fontweight='bold', color='black')
 
     plt.xticks(ind, ['Classification', 'Regression'])
-    plt.legend()
+    plt.legend(loc="lower right")
     plt.show()
 
     # Restore the default style
@@ -361,40 +361,30 @@ def plot_ensemble_accuracies(perc_clf, perc_reg):
 
 
 def plot_r2(r2_dict):
-    # Estrai i nomi dei modelli e i valori R2 dal dizionario
-    x_regressors = [x.replace("Regressor", "") for x in list(r2_dict.keys())]  # remove 'Regressor' from x labels
+    x_regressors = [x.replace("Regressor", "") for x in list(r2_dict.keys())]
     r2_values = list(r2_dict.values())
 
-    # Calcola la media dei valori R2
     mean_r2 = np.mean(r2_values)
-
-    # Colori per il grafico
     colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
 
-    # Crea la figura e l'asse
     fig, ax = plt.subplots()
 
-    # Aggiungi l'istogramma
     ax.bar(x_regressors, r2_values, color=colors)
+    ax.set_ylim(0, max(r2_values) + 0.15)
 
-    # Aggiungi la linea media
     ax.axhline(y=mean_r2, color='red', linestyle='dashed', label=f'Media ({mean_r2:.2f})')
 
-    # Aggiungi le etichette dell'asse x e y con stile grassetto
     ax.set_xlabel('Modelli', fontweight='bold')
     ax.set_ylabel('Valore R2', fontweight='bold')
-    ax.set_title('Confronto R2 dei Modelli', fontweight='bold')
 
-    # Aggiungi le etichette sopra le barre con maggiore trasparenza
     for i, v in enumerate(r2_values):
         ax.text(i, v + 0.01, f'{v:.2f}', ha='center', va='bottom', fontsize=10, fontweight='bold', alpha=0.8)
 
-    # Aggiungi una legenda
-    ax.legend()
-
-    # Mostra il grafico
+    ax.legend(loc='best')
+    ax.set_title('Confronto R2 dei Modelli', fontweight='bold')
     plt.tight_layout()
     plt.show()
+
 
 
 def plot_accuracy(accuracy_dict):
@@ -414,7 +404,7 @@ def plot_accuracy(accuracy_dict):
 
     # Aggiungi l'istogramma
     ax.bar(x_classifiers, accuracy_values, color=colors)
-
+    ax.set_ylim(0, max(accuracy_values) + 0.15)
     # Aggiungi la linea media
     ax.axhline(y=mean_accuracy, color='red', linestyle='dashed', label=f'Media ({mean_accuracy:.2f})')
 
@@ -428,41 +418,12 @@ def plot_accuracy(accuracy_dict):
         ax.text(i, v + 0.01, f'{v:.2f}', ha='center', va='bottom', fontsize=10, fontweight='bold', alpha=0.8)
 
     # Aggiungi una legenda
-    ax.legend()
+    ax.legend(loc="best")
 
     # Mostra il grafico
     plt.tight_layout()
     plt.show()
 
-
-def plot_r2b(scores_dict):
-    plt.figure(figsize=(10, 6))
-
-    # Estrai i nomi dei modelli e i valori di R2 dal dizionario
-    models = list(scores_dict.keys())
-    r2_scores = list(scores_dict.values())
-
-    # Crea il grafico a barre
-    bars = plt.bar(models, r2_scores, color='lightblue')
-
-    # Aggiungi le etichette dei valori sopra le barre
-    for bar in bars:
-        height = bar.get_height()
-        plt.annotate(f'{height:.3f}', xy=(bar.get_x() + bar.get_width() / 2, height),
-                     xytext=(0, 3), textcoords='offset points',
-                     ha='center', va='bottom')
-
-    # Aggiungi le griglie di sfondo meno evidenti
-    plt.grid(color='lightgray', linestyle='dashed', linewidth=0.5, alpha=0.5)
-
-    # Imposta le etichette degli assi e il titolo del grafico
-    plt.xlabel('Modelli')
-    plt.ylabel('R2 Score')
-    plt.title('Confronto R2 Score per Modelli di Regressione')
-
-    # Mostra il grafico
-    plt.tight_layout()
-    plt.show()
 
 
 if __name__ == "__main__":
@@ -523,7 +484,7 @@ if __name__ == "__main__":
     plot_prediction_differences(y_clf_pred, y_reg_pred)
     plot_error_by_class(y_test, y_clf_pred, y_reg_pred)
     plot_bar_ground_vs_predict(y_test, y_clf_pred, y_reg_pred)
-    plot_ensemble_accuracies(reg_clf, reg_acc)
+    plot_ensembles_common_accuracy(reg_clf, reg_acc)
     plot_confusion_matrix(targets=y_test, predictions=y_clf_pred, title="Confusion matrix - Classification",
                           classes=np.unique(y_test))
     plot_confusion_matrix(targets=y_test, predictions=y_reg_pred, title="Confusion matrix - Regression",
