@@ -541,7 +541,7 @@ if __name__ == "__main__":
     ####################################################################################################################
 
     ###     Graph
-    plot_performance_comparison(clf_acc_bef, reg_acc, clf_acc, reg_acc)
+    # plot_performance_comparison(clf_acc_bef, reg_acc_bef, clf_acc, reg_acc)
 
     # plot_r2(r2_dict)
     # plot_accuracy(clf_dict)
@@ -553,7 +553,7 @@ if __name__ == "__main__":
     # plot_error_by_class(y_test, y_clf_pred, y_reg_pred)
     # plot_bar_ground_vs_predict(y_test, y_clf_pred, y_reg_pred)
     # plot_ensembles_common_accuracy(clf_acc, reg_acc)
-    # plot_confusion_matrix(targets=y_test, predictions=y_clf_pred, title="Confusion matrix - Classification",
-    #                       classes=np.unique(y_test))
-    # plot_confusion_matrix(targets=y_test, predictions=y_reg_pred, title="Confusion matrix - Regression",
-    #                       classes=np.unique(y_test))
+    plot_confusion_matrix(targets=y_test, predictions=y_clf_pred, title="Confusion matrix - Classification",
+                          classes=np.unique(y_test))
+    plot_confusion_matrix(targets=y_test, predictions=y_reg_pred, title="Confusion matrix - Regression",
+                          classes=np.unique(y_test))
