@@ -1,49 +1,72 @@
-# Progetto di Machine Learning per l'Analisi dei Dati Automobilistici
+# Machine Learning Project for Automotive Data Analysis
 
-Questo progetto utilizza tecniche di machine learning per analizzare e predire dati automobilistici. Il dataset utilizzato contiene informazioni sui veicoli, come il prezzo, le specifiche tecniche, le prestazioni e altro. Lo scopo del progetto è sviluppare modelli di regressione per prevedere il prezzo dei veicoli e modelli di classificazione per classificare i veicoli in diverse categorie.
+## Overview
 
-## Istruzioni per l'esecuzione
+This project leverages machine learning techniques to analyze and predict automotive data. The dataset includes various vehicle details such as price, technical specifications, performance metrics, and more. The primary goals are to build regression models to predict vehicle prices and classification models to categorize vehicles into distinct segments.
 
-1. Installare le dipendenze:
-   Assicurarsi di avere tutte le dipendenze necessarie installate. È possibile installarle utilizzando `pip` con il seguente comando:
+## Features
 
-2. Esecuzione del codice:
-Per eseguire il progetto, utilizzare il file `main.py` con il seguente comando:
+- **Data Pre-processing:**  
+  Cleans the dataset by handling missing values and converting categorical variables into numerical ones, ensuring data consistency.
 
-3. Risultati:
-Una volta completata l'esecuzione, i risultati dei modelli di regressione e classificazione verranno visualizzati nel terminale. Inoltre, verranno creati dei file `.npz` contenenti i valori delle metriche di valutazione per ulteriori analisi.
+- **Feature Engineering and Selection:**  
+  Analyzes feature correlations to identify the most relevant variables for both regression and classification models. Visualizations such as correlation matrices support the selection process.
 
-## Struttura del Progetto
-* `main.py`: File principale per l'esecuzione del progetto.
-* `dataset.py`: Modulo per la gestione del dataset e il pre-processing dei dati.
-* `graph.py`: Modulo per la creazione e la visualizzazione di grafici e visualizzazioni.
-* `reg.py`: Modulo per la creazione e la valutazione dei modelli di regressione.
-* `clf.py`: Modulo per la creazione e la valutazione dei modelli di classificazione.
-* `utils.py`: Modulo contenente funzioni di utilità per la visualizzazione e l'analisi dei dati.
-* `arguments.py`: Modulo per la lettura degli argomenti da riga di comando.
-* `npz`: Directory contenente i file .npz con i valori delle metriche di valutazione.
+- **Regression Models:**  
+  Implements multiple regression algorithms (e.g., Support Vector Regression, Random Forest Regression, Gradient Boosting Regression) with hyperparameter tuning to accurately predict vehicle prices.
 
-## Descrizione delle Fasi del Progetto
+- **Classification Models:**  
+  Employs various classification algorithms (e.g., Support Vector Machine, Random Forest, Gradient Boosting) to classify vehicles into different categories.
 
-1. **Caricamento e Pre-processing del Dataset:**
-   Il dataset automobilistico è stato pre-processato per rimuovere valori nulli e convertire le variabili categoriche in variabili numeriche. Inoltre, per garantire una rappresentazione equilibrata delle diverse classi, sono state duplicate le righe delle classi sottorappresentate.
+- **Model Evaluation:**  
+  Uses metrics like Mean Squared Error (MSE), Mean Absolute Error (MAE), R-squared for regression, and Accuracy, F1-score, Precision, and Recall for classification. Evaluation results are visualized and saved as `.npz` files for further analysis.
 
-2. **Feature Selection e Visualizzazioni dei Dati:**
-   È stata eseguita un'analisi delle correlazioni tra le features per selezionare le migliori features per i modelli di regressione e classificazione. Sono stati creati diversi grafici e visualizzazioni per analizzare le relazioni tra le features e le prestazioni dei modelli.
+## Project Structure
 
-3. **Creazione dei Modelli di Regressione:**
-   Sono stati creati diversi modelli di regressione utilizzando algoritmi come Support Vector Regression (SVR), Random Forest Regression e Gradient Boosting Regression. Sono stati eseguiti esperimenti con diversi iperparametri per ogni modello per trovare la migliore configurazione. I modelli sono stati valutati utilizzando la validazione incrociata e sono stati selezionati i migliori modelli per la predizione del prezzo dei veicoli.
+- **`main.py`**:  
+  The main script that orchestrates data processing, model training, evaluation, and serialization of results.
 
-4. **Creazione dei Modelli di Classificazione:**
-   Sono stati creati modelli di classificazione utilizzando algoritmi come Support Vector Machine (SVM), Random Forest e Gradient Boosting. Sono stati eseguiti esperimenti con diversi iperparametri per ogni modello per trovare la migliore configurazione. I modelli sono stati valutati utilizzando la validazione incrociata e sono stati selezionati i migliori modelli per la classificazione dei veicoli in diverse categorie.
+- **`dataset.py`**:  
+  Handles dataset loading, pre-processing, and augmentation (including techniques like oversampling).
 
-5. **Valutazione dei Modelli:**
-   I modelli di regressione e classificazione sono stati valutati utilizzando diverse metriche di valutazione, come Mean Squared Error (MSE), Mean Absolute Error (MAE), R-squared e Accuracy. I risultati delle valutazioni sono stati visualizzati tramite grafici e tabelle per una facile interpretazione.
+- **`graph.py`**:  
+  Contains functions for creating visualizations, including correlation matrices and feature importance graphs.
 
-6. **Conclusioni e Prospettive Future:**
-   Sono state fornite conclusioni sulle prestazioni dei modelli e su come potrebbero essere migliorati. Sono state anche suggerite prospettive future per ulteriori ricerche e sviluppi del progetto.
+- **`reg.py`**:  
+  Responsible for building and evaluating regression models, and calculating related metrics.
 
----
-*Nota: Assicurarsi di avere Python e le librerie necessarie installate per eseguire il progetto.*
+- **`clf.py`**:  
+  Manages the creation and evaluation of classification models, along with performance metrics.
 
+- **`utils.py`**:  
+  Provides utility functions for additional data analysis and visualization tasks.
 
+- **`arguments.py`**:  
+  Reads and processes command-line arguments to configure the project execution.
+
+- **`npz/`**:  
+  Directory used for storing serialized evaluation metrics and results in `.npz` format.
+
+## Workflow
+
+1. **Data Loading and Pre-processing:**  
+   The dataset is loaded and cleaned by removing null values and converting categorical data into numerical formats. Oversampling is applied to balance underrepresented classes.
+
+2. **Feature Selection and Visualization:**  
+   A correlation analysis is performed to select the best features. Visual tools like correlation matrices and feature plots aid in understanding the relationships between variables.
+
+3. **Model Building:**  
+   - **Regression:**  
+     Multiple regression models are created using algorithms such as SVR, Random Forest, and Gradient Boosting. Hyperparameter tuning is conducted to determine the optimal configuration.
+   - **Classification:**  
+     Classification models are developed using SVM, Random Forest, and Gradient Boosting. The models are refined through extensive hyperparameter experimentation.
+
+4. **Model Evaluation:**  
+   Both model types are evaluated using cross-validation. Custom metrics are computed to compare performance, and standard evaluation metrics (MSE, MAE, R² for regression; accuracy, F1-score, precision, and recall for classification) are visualized and serialized.
+
+5. **Results and Future Directions:**  
+   Final results are summarized and saved for further analysis. Insights on model performance are discussed, along with potential future improvements and research directions.
+
+## Contributing
+
+Contributions to enhance the project are welcome. Please submit issues or pull requests for bug fixes and feature enhancements.
